@@ -645,4 +645,4 @@ def update_subtask(subtask_id):
     return render_template('update_subtask.html', subtask=subtask, Members=member,Team_Lead=team_lead)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
