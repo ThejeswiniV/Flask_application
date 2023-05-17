@@ -7,7 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
 from email_validator import validate_email, EmailNotValidError
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, func
 import bcrypt
 import pandas as pd
 import json
@@ -570,8 +570,9 @@ def update_project(project_id):
     project = Project.query.get_or_404(project_id)
     managers = Users.query.filter_by(User_Role='Manager').all()
     admins = Users.query.filter_by(User_Role='Admin').all()
-    member=Users.query.filter_by(User_Role='Member').all()
-    team_lead=Users.query.filter_by(User_Role='Team Lead').all()
+    members = Users.query.filter_by(User_Role='Member').all()
+    team_leads = Users.query.filter_by(User_Role='Team Lead').all()
+
     if request.method == 'POST':
         if 'ProjectName' in request.form:
             project.ProjectName = request.form['ProjectName']
@@ -583,8 +584,9 @@ def update_project(project_id):
             project.ProjectManager = request.form['ProjectManager']
         if 'CreatedBy' in request.form:
             project.CreatedBy = request.form['CreatedBy']
-        if 'Members' in request.form:
-            project.Members = request.form['Members']
+        if 'members' in request.form:
+            selected_members = request.form.getlist('members')  # Get list of selected member emails
+            project.Members = ','.join(selected_members)  # Convert the list to a comma-separated string
         if 'StartDate' in request.form:
             project.StartDate = dt.datetime.strptime(request.form['StartDate'], '%Y-%m-%d').date()
         if 'EndDate' in request.form:
@@ -593,7 +595,7 @@ def update_project(project_id):
         flash('Project details updated successfully!', 'success')
         return redirect(url_for('project_details', project_id=project.id))
 
-    return render_template('update_project.html', project=project, Managers=managers, Admins=admins,Members=member,Team_Lead=team_lead)
+    return render_template('update_project.html', project=project, Managers=managers, Admins=admins, Members=members, Team_Lead=team_leads)
 
 @app.route('/epic/<int:epic_id>/update_epic', methods=['GET', 'POST'])
 def update_epic(epic_id):
@@ -634,8 +636,8 @@ def update_subtask(subtask_id):
     if request.method == 'POST':
         subtask.SubtaskName = request.form.get('SubtaskName')
         subtask.SubtaskDescription = request.form.get('SubtaskDescription')
-        if 'assigned_to' in request.form:
-            subtask.AssignedTo = request.form['assigned_to']
+        if 'AssignedTo' in request.form:
+            subtask.AssignedTo = request.form.get('AssignedTo')
         subtask.StartDate = dt.datetime.strptime(request.form['StartDate'], '%Y-%m-%d').date()
         subtask.EndDate = dt.datetime.strptime(request.form['EndDate'], '%Y-%m-%d').date()
         db.session.commit()

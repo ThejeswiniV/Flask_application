@@ -38,18 +38,18 @@ Update Project - {{ project.ProjectName }}
             </select>
         </div>    
 
-<div class="form-group">
-    <label for="members" class="form-label">Members:</label>
-    <select id="members" name="members[]" multiple class="form-select custom-select" required>
-        <option value="">--Select--</option>
-        {% for member in Members %}
-        <option value="{{ member.Email.split('@')[0].lower() }}" {% if member.Email.split('@')[0].lower() in project.Members %}selected{% endif %}>{{ member.Email.split('@')[0].lower() }}</option>
-        {% endfor %}
-        {% for team_lead in Team_Lead %}
-        <option value="{{ team_lead.Email.split('@')[0].lower() }}" {% if team_lead.Email.split('@')[0].lower() in project.Members %}selected{% endif %}>{{ team_lead.Email.split('@')[0].lower() }}</option>
-        {% endfor %}
-    </select>
-</div>
+        <div class="form-group">
+            <label for="members" class="form-label">Members:</label>
+            <select id="members" name="members" multiple class="form-select custom-select" required>
+                <option value="">--Select--</option>
+                {% for member in Members %}
+                <option value="{{ member.Email}}" {% if member.Email in project.Members %}selected{% endif %}>{{ member.Email }}</option>
+                {% endfor %}
+                {% for team_lead in Team_Lead %}
+                <option value="{{ team_lead.Email }}" {% if team_lead.Email in project.Members %}selected{% endif %}>{{ team_lead.Email }}</option>
+                {% endfor %}
+            </select>
+        </div> 
 
         <div class="form-group">
             <label for="start-date" class="form-label">Start Date:</label>

@@ -30,10 +30,7 @@ Update Subtask - {{ subtask.SubtaskName }}
       <select id="assigned_to" name="AssignedTo" class="form-select custom-select" required>
         <option value="">-- Select --</option>
         {% for member in Members %}
-        <option value="{{ member.Email.split('@')[0].lower() }}" {% if subtask.AssignedTo == member.Email.split('@')[0].lower() or (not subtask.AssignedTo and loop.first) %}selected{% endif %}>{{ member.Email.split('@')[0].lower() }}</option>
-        {% endfor %}
-        {% for team_lead in Team_Lead %}
-        <option value="{{ team_lead.Email.split('@')[0].lower() }}" {% if subtask.AssignedTo == team_lead.Email.split('@')[0].lower() %}selected{% endif %}>{{ team_lead.Email.split('@')[0].lower() }}</option>
+        <option value="{{ member.Email }}" {% if subtask.AssignedTo == member.Email or (not subtask.AssignedTo and loop.first) %}selected{% endif %}>{{ member.Email }}</option>
         {% endfor %}
       </select>
     </div>     
