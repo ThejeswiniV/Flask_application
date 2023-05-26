@@ -48,7 +48,12 @@ Projects Home
 <td>{{ project.ProjectDescription | truncate(50, True, '...') }}</td>
 <td>{{ project.ProjectManager.split('@')[0].lower() }}</td>
 <td>{{ project.CreatedBy.split('@')[0].lower() }}</td>
-<td>{{ project.Members }}</td>
+<td>
+{% set members = project.Members.split(',') %}
+  {% for member in members %}
+    {{ member.split('@')[0] }}{% if not loop.last %}, {% endif %}
+  {% endfor %}
+</td>
 <td>{{ project.StartDate }}</td>
 <td>{{ project.EndDate }}</td>
 <td>{{ project.CreationDate.date() }}</td>
