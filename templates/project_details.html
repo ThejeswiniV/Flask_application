@@ -101,7 +101,12 @@
     <div class="card  text-center bg-primary text-white">
       <div class="card-body">
         <h5 class="card-title">Members</h5>
-        <p class="card-text">{{ project.Members}}</p>
+        <p class="card-text">
+          {% set members = project.Members.split(',') %}
+            {% for member in members %}
+             {{ member.split('@')[0] }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
       </div>
     </div>
   </div>
