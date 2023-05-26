@@ -33,7 +33,9 @@ Projects Home
 <th scope="col">Project Description</th>
 <th scope="col">Project Manager</th>
 <th scope="col">Created By</th>
+<!--
 <th scope="col">Members</th>
+-->
 <th scope="col">Start Date</th>
 <th scope="col">End Date</th>
 <th scope="col">Creation Date</th>
@@ -48,12 +50,14 @@ Projects Home
 <td>{{ project.ProjectDescription | truncate(50, True, '...') }}</td>
 <td>{{ project.ProjectManager.split('@')[0].lower() }}</td>
 <td>{{ project.CreatedBy.split('@')[0].lower() }}</td>
+<!--
 <td>
 {% set members = project.Members.split(',') %}
   {% for member in members %}
     {{ member.split('@')[0] }}{% if not loop.last %}, {% endif %}
   {% endfor %}
 </td>
+-->
 <td>{{ project.StartDate }}</td>
 <td>{{ project.EndDate }}</td>
 <td>{{ project.CreationDate.date() }}</td>
