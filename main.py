@@ -486,15 +486,17 @@ def project_details(project_id):
 @app.route('/epic/<int:epic_id>', methods=['GET'])
 def epic_details(epic_id):
     epic = Epic.query.get_or_404(epic_id)
+    project = Project.query.get_or_404(epic.ProjectID)
     stories_data = Story.query.filter_by(EpicID=epic_id).all()
-    return render_template('epic_details.html', epic=epic, stories=stories_data)
+    return render_template('epic_details.html', epic=epic, project_name=project.ProjectName, stories=stories_data)
 
 @app.route('/story/<int:story_id>', methods=['GET'])
 def story_details(story_id):
     story = Story.query.get_or_404(story_id)
     epic = Epic.query.get_or_404(story.EpicID)
+    project = Project.query.get_or_404(epic.ProjectID)
     subtasks_data = Subtask.query.filter_by(StoryID=story_id).all()
-    return render_template('story_details.html', epic=epic, story=story, subtasks=subtasks_data)
+    return render_template('story_details.html', epic=epic, project_name=project.ProjectName, epic_name=epic.EpicName, story=story, subtasks=subtasks_data)
 
 @app.route('/subtasks/<int:subtask_id>', methods=['GET', 'POST'])
 def subtask_details(subtask_id):    

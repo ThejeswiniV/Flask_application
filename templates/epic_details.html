@@ -15,6 +15,16 @@
     </div>
   {% endfor %}
 {% endwith %}
+
+<div class="container-fluid p-0 m-0">
+  <nav class="breadcrumb bg-transparent shadow-none p-0 m-0" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('project_details', project_id=epic.ProjectID) }}">{{ project_name }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ epic.EpicName }}</li>
+    </ol>
+  </nav>  
+</div>
+
 <div class="container-fluid">
 
   <div class="row">
