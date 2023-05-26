@@ -133,7 +133,7 @@
         <td scope="row">{{ subtask.id }}</td>
         <td>{{ subtask.SubtaskName }}</td>
         <td>{{ subtask.SubtaskDescription }}</td>
-        <td>{{ subtask.AssignedTo }}</td>
+        <td>{{ subtask.AssignedTo.split('@')[0].lower() }}</td>
         <td>{{ subtask.StartDate }}</td>
         <td>{{ subtask.EndDate }}</td>
         <td>{{ subtask.CreatedBy.split('@')[0].lower() }}</td>
