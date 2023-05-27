@@ -113,7 +113,7 @@ def restrict_access_member():
     if user_id:
         user = Users.query.filter_by(id=user_id).first()
         if user.User_Role == 'Member':
-            restricted_functions = ['add_project', 'add_epic', 'add_story', 'add_subtask', 'update_project', 'update_epic', 'update_story', 'update_subtask', 'delete_subtask', 'delete_story', 'delete_epic','show_projects','project_details','story_details','epic_details', 'show_users','update_user_role']
+            restricted_functions = ['add_project', 'add_epic', 'add_story', 'add_subtask', 'update_project', 'update_epic', 'update_story', 'update_subtask', 'delete_subtask', 'delete_story', 'delete_epic','show_projects','project_details','story_details','epic_details', 'show_users','update_user_role', 'show_all_subtask_status']
             if request.endpoint in restricted_functions:
                 abort(403)  # Forbidden
 
@@ -647,6 +647,18 @@ def update_subtask(subtask_id):
         return redirect(url_for('story_details', story_id=subtask.StoryID ))
 
     return render_template('update_subtask.html', subtask=subtask, Members=member,Team_Lead=team_lead)
+
+#Subtask Status View
+@app.route('/all_subtask_status')
+def show_all_subtask_status():
+    incomplete_subtasks = Subtask.query.filter(Subtask.Status == 'InProgress', Subtask.EndDate < dt.date.today()).all()
+    in_progress_subtasks = Subtask.query.filter(Subtask.Status == 'InProgress', Subtask.EndDate >= dt.date.today()).all()
+    completed_subtasks = Subtask.query.filter(Subtask.Status == 'Complete').all()
+
+    return render_template('subtasks_all_status.html',
+                           incomplete_subtasks=incomplete_subtasks,
+                           in_progress_subtasks=in_progress_subtasks,
+                           completed_subtasks=completed_subtasks)
 
 if __name__ == "__main__":
     app.run()
