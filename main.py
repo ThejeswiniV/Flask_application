@@ -273,12 +273,28 @@ def show_user_home():
         if user.User_Role == 'Member':
             assigned_subtasks_inprogress = Subtask.query.filter_by(AssignedTo=user.Email).filter_by(Status='InProgress').all()
             assigned_subtasks_complete = Subtask.query.filter_by(AssignedTo=user.Email).filter_by(Status='Complete').all()
-            return render_template('member_home.html', 
-                                   projects=projects_data, 
-                                   user=user, subtask=subtask,
-                                   assigned_subtasks_inprogress=assigned_subtasks_inprogress,
-                                   assigned_subtasks_complete=assigned_subtasks_complete)
+            
+            # Fetch the project names for assigned subtasks in progress
+            assigned_subtasks_inprogress_with_project = []
+            for subtask in assigned_subtasks_inprogress:
+                project_name = (Project.query.join(Epic).join(Story, Epic.id == Story.EpicID).filter(Story.id == subtask.StoryID).first().ProjectName)
 
+                assigned_subtasks_inprogress_with_project.append((subtask, project_name))
+            
+            # Fetch the project names for assigned completed subtasks
+            assigned_subtasks_complete_with_project = []
+            for subtask in assigned_subtasks_complete:
+                project_name = (Project.query.join(Epic).join(Story, Epic.id == Story.EpicID).filter(Story.id == subtask.StoryID).first().ProjectName)
+
+
+                assigned_subtasks_complete_with_project.append((subtask, project_name))
+            
+            return render_template('member_home.html',
+                                   projects=projects_data,
+                                   user=user, subtask=subtask,
+                                   assigned_subtasks_inprogress=assigned_subtasks_inprogress_with_project,
+                                   assigned_subtasks_complete=assigned_subtasks_complete_with_project)
+        
     return render_template('dashboard.html', projects=projects_data, total_unique_projects = total_unique_projects, total_unique_epics = total_unique_epics, total_unique_stories = total_unique_stories, total_unique_subtasks = total_unique_subtasks, user_role_json=user_role_json, subtask_fig_json=subtask_fig_json)
 
 #PROJECTS PAGE:
