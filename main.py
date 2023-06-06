@@ -284,8 +284,22 @@ def show_user_home():
 #PROJECTS PAGE:
 @app.route('/projects')
 def show_projects():
-    projects_data = Project.query.all()
-    return  render_template('home_project.html', projects= projects_data)
+    if 'user_id' not in session:
+        flash('You need to log in first', 'warning')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    user = Users.query.get(user_id)
+
+    if user.User_Role == 'Admin':
+        projects_data = Project.query.all()
+    elif user.User_Role == 'Manager':
+        user_email = user.Email.split('@')[0].lower()
+        projects_data = Project.query.filter_by(ProjectManager=user_email).all()
+    else:
+        projects_data = []
+
+    return render_template('home_project.html', projects=projects_data)
 
 #USER CONTROL PAGE FOR ADMIN
 @app.route('/user_control')
