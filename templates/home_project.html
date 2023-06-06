@@ -43,7 +43,6 @@ Projects Home
 </thead>
 <tbody>
 {% for project in projects %}
-{% if user.User_Role != 'Manager' or user.Email == project.ProjectManager %}
 <tr>
 <td scope="row">{{ project.id }}</td>
 <td><a href="{{ url_for('project_details', project_id=project.id) }}">{{ project.ProjectName }}</a></td>
@@ -63,7 +62,6 @@ Projects Home
 <td>{{ project.EndDate }}</td>
 <td>{{ project.CreationDate.date() }}</td>
 </tr>
-{% endif %}
 {% endfor %}
 </tbody>
 </table>
