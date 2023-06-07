@@ -20,7 +20,8 @@ Member Home
 {% if not assigned_subtasks_inprogress %}
 <p>You have no SubTasks Assigned To You at the moment. Come back and Check later.</p>
 {% else %}
-{% for subtask, project_name in assigned_subtasks_inprogress %}
+{% set sorted_assigned_subtasks_inprogress = assigned_subtasks_inprogress|sort(reverse=true, attribute='0.CreationDate') %}
+{% for subtask, project_name in sorted_assigned_subtasks_inprogress %}
 <div class="card bg-light col-10">
   <div class="card-header bg-light">
     <div class="col-md-10">Project Name: {{ project_name }}</div>
@@ -50,7 +51,8 @@ Member Home
 {% if not assigned_subtasks_complete %}
 <p>You have not Completed any SubTasks. Your Completed SubTasks will appear here as you finish them.</p>
 {% else %}
-{% for subtask, project_name in assigned_subtasks_complete %}
+{% set sorted_assigned_subtasks_complete = assigned_subtasks_complete|sort(reverse=true, attribute='0.CreationDate') %}
+{% for subtask, project_name in sorted_assigned_subtasks_complete %}
 <div class="card bg-light col-10">
   <div class="card-header bg-light">
     <div class="col-md-10">Project Name: {{ project_name }}</div>
