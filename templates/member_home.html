@@ -23,10 +23,8 @@ Member Home
 {% set sorted_assigned_subtasks_inprogress = assigned_subtasks_inprogress|sort(reverse=true, attribute='0.CreationDate') %}
 {% for subtask, project_name in sorted_assigned_subtasks_inprogress %}
 <div class="card bg-light col-10">
-  <div class="card-header bg-light row">
-    <div class="col-md-6">Project Name: {{ project_name }}</div>
-    <div class="col-md-2">Type: {{ subtask.SubtaskType }}</div>
-    <div class="col-md-2">Priority: {{ subtask.Priority }}</div>
+  <div class="card-header bg-light">
+    <div class="col-md-10">Project Name: {{ project_name }}</div>
   </div>
   <div class="card-body">
     <div class="d-flex justify-content-between">
@@ -56,10 +54,8 @@ Member Home
 {% set sorted_assigned_subtasks_complete = assigned_subtasks_complete|sort(reverse=true, attribute='0.CreationDate') %}
 {% for subtask, project_name in sorted_assigned_subtasks_complete %}
 <div class="card bg-light col-10">
-  <div class="card-header bg-light row">
-    <div class="col-md-6">Project Name: {{ project_name }}</div>
-    <div class="col-md-2">Type: {{ subtask.SubtaskType }}</div>
-    <div class="col-md-2">Priority: {{ subtask.Priority }}</div>
+  <div class="card-header bg-light">
+    <div class="col-md-10">Project Name: {{ project_name }}</div>
   </div>
   <div class="card-body">
     <div class="d-flex justify-content-between">
