@@ -45,6 +45,26 @@ Update Subtask - {{ subtask.SubtaskName }}
       <input type="date" id="EndDate" name="EndDate" class="form-control" value="{{ subtask.EndDate }}" required>
     </div>
 
+    <div class="form-floating mb-3">
+      <label for="SubtaskType">Subtask Type:</label>
+      <select id="SubtaskType" name="SubtaskType" class="form-select custom-select" required>
+        <option value="">-- Select --</option>
+        <option value="Task" {% if subtask.SubtaskType == 'Task' %}selected{% endif %}>Task</option>
+        <option value="Bug" {% if subtask.SubtaskType == 'Bug' %}selected{% endif %}>Bug</option>
+      </select>
+    </div>
+    
+    <div class="form-floating mb-3">
+      <label for="Priority">Priority:</label>
+      <select id="Priority" name="Priority" class="form-select custom-select" required>
+        <option value="">-- Select --</option>
+        <option value="Low" {% if subtask.Priority == 'Low' %}selected{% endif %}>Low</option>
+        <option value="Medium" {% if subtask.Priority == 'Medium' %}selected{% endif %}>Medium</option>
+        <option value="High" {% if subtask.Priority == 'High' %}selected{% endif %}>High</option>
+        <option value="Urgent" {% if subtask.Priority == 'Urgent' %}selected{% endif %}>Urgent</option>
+      </select>
+    </div>
+
     <div class="form-group">
       <div class="d-grid">
         <input type="submit" value="Update" class="btn btn-primary">
