@@ -113,7 +113,10 @@ def restrict_access_member():
     if user_id:
         user = Users.query.filter_by(id=user_id).first()
         if user.User_Role == 'Member':
-            restricted_functions = ['add_project', 'add_epic', 'add_story', 'add_subtask', 'update_project', 'update_epic', 'update_story', 'update_subtask', 'delete_subtask', 'delete_story', 'delete_epic','show_projects','project_details','story_details','epic_details', 'show_users','update_user_role', 'show_all_subtask_status']
+            restricted_functions = ['add_project', 'add_epic', 'add_story', 'add_subtask', 'update_project', 'update_epic',
+                                     'update_story', 'update_subtask', 'delete_subtask', 'delete_story', 'delete_epic',
+                                     'show_projects','project_details','story_details','epic_details', 'show_users','update_user_role',
+                                       'show_all_subtask_status', 'delete_project']
             if request.endpoint in restricted_functions:
                 abort(403)  # Forbidden
 
@@ -124,7 +127,8 @@ def restrict_access_teamlead():
     if user_id:
         user = Users.query.filter_by(id=user_id).first()
         if user.User_Role == 'Team Lead':
-            restricted_functions = ['add_project', 'add_epic', 'add_story', 'update_project', 'update_epic', 'update_story', 'delete_story', 'delete_epic','show_users','update_user_role']
+            restricted_functions = ['add_project', 'add_epic', 'add_story', 'update_project', 'update_epic', 'update_story', 
+                                    'delete_story', 'delete_epic','show_users','update_user_role', 'delete_project']
             if request.endpoint in restricted_functions:
                 abort(403)  # Forbidden
 
@@ -135,7 +139,7 @@ def restrict_access_manager():
     if user_id:
         user = Users.query.filter_by(id=user_id).first()
         if user.User_Role == 'Manager':
-            restricted_functions = ['add_project', 'update_project','show_users','update_user_role']
+            restricted_functions = ['add_project', 'update_project','show_users','update_user_role', 'delete_project']
             if request.endpoint in restricted_functions:
                 abort(403)  # Forbidden
 #Injecting User Info to all pages
@@ -551,6 +555,39 @@ def subtask_details(subtask_id):
     return render_template('subtask_details.html', subtask=subtask, user=user)
 
 #DELETE ROUTES
+@app.route('/project/<int:project_id>/delete_project', methods=['POST'])
+def delete_project(project_id):
+    project = Project.query.get_or_404(project_id)
+
+    # Delete subtasks
+    subtasks = Subtask.query \
+        .join(Story, Story.id == Subtask.StoryID) \
+        .join(Epic, Epic.id == Story.EpicID) \
+        .filter(Epic.ProjectID == project.id) \
+        .all()
+    for subtask in subtasks:
+        db.session.delete(subtask)
+
+    # Delete stories
+    stories = Story.query \
+        .join(Epic, Epic.id == Story.EpicID) \
+        .filter(Epic.ProjectID == project.id) \
+        .all()
+    for story in stories:
+        db.session.delete(story)
+
+    # Delete epics
+    epics = Epic.query.filter_by(ProjectID=project.id).all()
+    for epic in epics:
+        db.session.delete(epic)
+
+    # Delete project
+    db.session.delete(project)
+    db.session.commit()
+
+    flash('Project deleted successfully.', 'success')
+    return redirect(url_for('show_projects'))
+
 @app.route('/project/<int:project_id>/delete_epic/<int:epic_id>', methods=['POST'])
 def delete_epic(project_id, epic_id):
     epic = Epic.query.get_or_404(epic_id)
