@@ -33,18 +33,6 @@
     <div class="col-md-6">
       <h3>{{ subtask.SubtaskName }} - Details</h3>
     </div>
-    {% if user.User_Role in ['Member', 'Team Lead'] %}
-    <div class="col-md-6 text-right">
-      <form method="POST" class="d-inline-block mr-2">
-        <input type="hidden" name="status" value="Complete">
-        <button type="submit" class="btn btn-success">Mark SubTask as Completed</button>
-      </form>
-  
-      <form method="POST" class="d-inline-block">
-        <input type="hidden" name="status" value="InProgress">
-        <button type="submit" class="btn btn-danger">Mark SubTask as In-Progress</button>
-      </form>
-    </div>
     {% endif %}
     {% if user.User_Role not in ['Member', 'Team Lead'] %}
     <div class="col-md-4 offset-md-2">
