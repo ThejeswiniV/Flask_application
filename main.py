@@ -94,9 +94,24 @@ class Subtask(db.Model):
     CreationDate = db.Column(db.DateTime(), nullable=False)
     Status = db.Column(db.String(250), default='InProgress', nullable=False, )
     StoryID = db.Column(db.Integer(), db.ForeignKey('story.id'), nullable=False)
+    discussions = db.relationship('Discussion', backref='subtask', foreign_keys='Discussion.SubtaskID', lazy=True)
 
     def __repr__(self):
         return 'subtask.id'
+
+class Discussion(db.Model):
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
+    UserID = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+    SubtaskID = db.Column(db.Integer(), db.ForeignKey('subtask.id'), nullable=False)
+    Comment = db.Column(db.Text, nullable=False)
+    Timestamp = db.Column(db.DateTime(), nullable=False)
+    Sent = db.Column(db.Boolean(), default=False, nullable=False)
+    Seen = db.Column(db.Boolean(), default=False, nullable=False)
+    user = db.relationship('Users', backref='discussions')
+
+    def __repr__(self):
+        return 'discussion.id'
+
 
 #Public User Restrictions    
 @app.before_request
@@ -113,10 +128,9 @@ def restrict_access_member():
     if user_id:
         user = Users.query.filter_by(id=user_id).first()
         if user.User_Role == 'Member':
-            restricted_functions = ['add_project', 'add_epic', 'add_story', 'add_subtask', 'update_project', 'update_epic',
-                                     'update_story', 'update_subtask', 'delete_subtask', 'delete_story', 'delete_epic',
-                                     'show_projects','project_details','story_details','epic_details', 'show_users','update_user_role',
-                                       'show_all_subtask_status', 'delete_project']
+            restricted_functions = ['add_project', 'add_epic', 'add_story', 'add_subtask', 'update_project', 'update_epic', 'update_story',
+                                     'update_subtask', 'delete_subtask', 'delete_story', 'delete_epic','show_projects','project_details',
+                                     'story_details','epic_details', 'show_users','update_user_role', 'show_all_subtask_status', 'delete_project']
             if request.endpoint in restricted_functions:
                 abort(403)  # Forbidden
 
@@ -127,8 +141,8 @@ def restrict_access_teamlead():
     if user_id:
         user = Users.query.filter_by(id=user_id).first()
         if user.User_Role == 'Team Lead':
-            restricted_functions = ['add_project', 'add_epic', 'add_story', 'update_project', 'update_epic', 'update_story', 
-                                    'delete_story', 'delete_epic','show_users','update_user_role', 'delete_project']
+            restricted_functions = ['add_project', 'add_epic', 'add_story', 'update_project', 'update_epic', 'update_story', 'delete_story',
+                                     'delete_epic','show_users','update_user_role', 'delete_project']
             if request.endpoint in restricted_functions:
                 abort(403)  # Forbidden
 
@@ -139,7 +153,7 @@ def restrict_access_manager():
     if user_id:
         user = Users.query.filter_by(id=user_id).first()
         if user.User_Role == 'Manager':
-            restricted_functions = ['add_project', 'update_project','show_users','update_user_role', 'delete_project']
+            restricted_functions = ['add_project', 'update_project','show_users','update_user_role','delete_project']
             if request.endpoint in restricted_functions:
                 abort(403)  # Forbidden
 #Injecting User Info to all pages
@@ -535,6 +549,11 @@ def story_details(story_id):
 @app.route('/subtasks/<int:subtask_id>', methods=['GET', 'POST'])
 def subtask_details(subtask_id):    
     subtask = Subtask.query.get_or_404(subtask_id)
+    story = Story.query.get_or_404(subtask.StoryID)
+    epic = Epic.query.get_or_404(story.EpicID)
+    project = Project.query.get_or_404(epic.ProjectID)
+    user_id = session['user_id']  # Retrieve the user ID from the session
+    timestamp = dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30)
     user = None
     if 'user_id' in session:
         user_id = session['user_id']
@@ -551,13 +570,80 @@ def subtask_details(subtask_id):
         elif new_status == "InProgress":
             flash("You have Marked the SubTask In Progress", 'warning')
         return redirect(url_for('show_user_home'))
+    
+    if request.method == 'POST':
+        comment = request.form['comment']
+        # Create a new discussion object
+        discussion = Discussion(SubtaskID=subtask_id, UserID=user_id, Comment=comment, Timestamp=timestamp)
+        # Add the discussion to the database
+        db.session.add(discussion)
+        db.session.commit()
+        flash('Discussion added successfully.', 'success')
+        return redirect(url_for('subtask_discussion', subtask_id=subtask_id))
+
+    # Fetch the discussions for the subtask
+    discussions = Discussion.query.filter_by(SubtaskID=subtask_id).all()
+
+    for discussion in discussions:
+        if discussion.UserID != user_id:
+            discussion.Seen = True  # Update Seen status for discussions seen by the receiver
+    db.session.commit()
         
-    return render_template('subtask_details.html', subtask=subtask, user=user)
+    return render_template('subtask_details.html', subtask=subtask, epic=epic, story=story, user_id=user_id, project_name=project.ProjectName, epic_name=epic.EpicName, discussions=discussions)
+
+@app.route('/subtask/<int:subtask_id>/discussion', methods=['GET', 'POST'])
+def subtask_discussion(subtask_id):
+    subtask = Subtask.query.get_or_404(subtask_id)
+    story = Story.query.get_or_404(subtask.StoryID)
+    epic = Epic.query.get_or_404(story.EpicID)
+    project = Project.query.get_or_404(epic.ProjectID)
+    user_id = session['user_id']
+    timestamp = dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30)
+
+    if request.method == 'POST':
+        comment = request.form['comment']
+        discussion = Discussion(SubtaskID=subtask_id, UserID=user_id, Comment=comment, Timestamp=timestamp, Sent=True)
+        db.session.add(discussion)
+        db.session.commit()
+        flash('Discussion added successfully.', 'success')
+        return redirect(url_for('subtask_discussion', subtask_id=subtask_id))
+
+    discussions = Discussion.query.filter_by(SubtaskID=subtask_id).all()
+
+    for discussion in discussions:
+        if discussion.UserID != user_id:
+            discussion.Seen = True  # Update Seen status for discussions seen by the receiver
+    db.session.commit()
+
+    return render_template('subtask_discussion.html', epic=epic, project=project, story=story, subtask=subtask, discussions=discussions, user_id=user_id)
+
+@app.route('/subtask/<int:subtask_id>/add_comment', methods=['POST'])
+def add_comment(subtask_id):
+    comment = request.form.get('comment')
+    user_id = session['user_id']
+    subtask = Subtask.query.get_or_404(subtask_id)
+
+    discussion = Discussion(UserID=user_id, SubtaskID=subtask_id, Comment=comment, Sent=True)
+    db.session.add(discussion)
+    db.session.commit()
+
+    flash('Comment added successfully.', 'success')
+    return redirect(url_for('subtask_discussion', subtask_id=subtask_id))
 
 #DELETE ROUTES
 @app.route('/project/<int:project_id>/delete_project', methods=['POST'])
 def delete_project(project_id):
     project = Project.query.get_or_404(project_id)
+
+    # Delete discussions
+    discussions = Discussion.query \
+    .join(Subtask, Subtask.id == Discussion.SubtaskID) \
+    .join(Story, Story.id == Subtask.StoryID) \
+    .join(Epic, Epic.id == Story.EpicID) \
+    .filter(Epic.ProjectID == project.id) \
+    .all()
+    for discussion in discussions:
+        db.session.delete(discussion)
 
     # Delete subtasks
     subtasks = Subtask.query \
@@ -728,4 +814,4 @@ def show_all_subtask_status():
                            completed_subtasks=completed_subtasks)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

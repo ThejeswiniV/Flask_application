@@ -15,17 +15,6 @@
     </div>
   {% endfor %}
 {% endwith %}
-
-<div class="container-fluid p-0 m-0">
-  <nav class="breadcrumb bg-transparent shadow-none p-0 m-0" aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{{ url_for('project_details', project_id=epic.ProjectID) }}">{{ project_name }}</a></li>
-      <li class="breadcrumb-item"><a href="{{ url_for('epic_details', epic_id=epic.id) }}">{{ epic_name }}</a></li>
-      <li class="breadcrumb-item active" aria-current="page">{{ story.StoryName }}</li>
-    </ol>
-  </nav>  
-</div>
-
 <div class="container-fluid">
 
   <div class="row">
@@ -40,7 +29,15 @@
     </div>
     {% endif %}
   </div>
+      </div>
+      </div>
+    </li>
+  </ul>
+</nav>
 </div>
+    </li>
+  </ul>
+</nav>
 
 <br>
 
@@ -90,8 +87,6 @@
       <div class="card-body">
         <h5 class="card-title">Story Description</h5>
         <p class="card-text">{{ story.StoryDescription }}</p>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -131,9 +126,9 @@
       {% for subtask in subtasks %}
       <tr>
         <td scope="row">{{ subtask.id }}</td>
-        <td>{{ subtask.SubtaskName }}</td>
+        <td><a href="{{ url_for('subtask_discussion', subtask_id=subtask.id) }}">{{ subtask.SubtaskName }}</a></td>
         <td>{{ subtask.SubtaskDescription }}</td>
-        <td>{{ subtask.AssignedTo.split('@')[0].lower() }}</td>
+        <td>{{ subtask.AssignedTo }}</td>
         <td>{{ subtask.StartDate }}</td>
         <td>{{ subtask.EndDate }}</td>
         <td>{{ subtask.CreatedBy.split('@')[0].lower() }}</td>

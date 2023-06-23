@@ -1,0 +1,153 @@
+{% extends "base_layout.html" %}
+
+{% block title %}
+{{ subtask.SubtaskName }} - Subtask Discussion
+{% endblock %}
+
+{% block main %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+{% endwith %}
+
+<div class="container-fluid p-0 m-0">
+  <nav class="breadcrumb bg-transparent shadow-none p-0 m-0" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('project_details', project_id=project.id) }}">{{ project.ProjectName }}</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('epic_details', epic_id=epic.id) }}">{{ epic.EpicName }}</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('story_details', story_id=story.id) }}">{{ story.StoryName }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ subtask.SubtaskName }}</li>
+    </ol>
+  </nav>  
+</div>
+
+<div class="container-fluid">
+
+  <div class="row">
+    <div class="col-md-6">
+      <h3>{{ subtask.SubtaskName }} - Details</h3>
+    </div>
+    {% if user.User_Role not in ['Member', 'Team Lead'] %}
+    <div class="col-md-4 offset-md-2">
+      <form action="{{ url_for('update_subtask', subtask_id=subtask.id) }}" method="GET" style="text-align: right;">
+        <button type="submit" class="btn btn-warning">Update {{ subtask.SubtaskName }} - Subtask</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<br>
+
+<div class="row">
+  <div class="col-sm-3">
+    <div class="card text-center bg-primary text-white">
+      <div class="card-body">
+        <h5 class="card-title">Start Date</h5>
+        <p class="card-text">{{ subtask.StartDate }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-3">
+    <div class="card text-center bg-primary text-white">
+      <div class="card-body">
+        <h5 class="card-title">End Date</h5>
+        <p class="card-text">{{ subtask.EndDate }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-3">
+    <div class="card  text-center bg-primary text-white">
+      <div class="card-body">
+        <h5 class="card-title">Creation Date</h5>
+        <p class="card-text">{{ subtask.CreationDate.date() }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-3">
+    <div class="card  text-center bg-primary text-white">
+      <div class="card-body">
+        <h5 class="card-title">Created By</h5>
+        <p class="card-text">{{ subtask.CreatedBy }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card text-white bg-secondary">
+      <div class="card-body">
+        <h5 class="card-title">Subtask Description</h5>
+        <p class="card-text">{{ subtask.SubtaskDescription }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+
+<div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title">Add Discussion</h4>
+        </div>
+        <div class="card-body">
+          <form action="{{ url_for('subtask_discussion', subtask_id=subtask.id) }}" method="POST">
+            <div class="form-group">
+              <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="Enter your comment" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Discussion</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<br>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title">Discussions</h4>
+      </div>
+      <div class="card-body" style="max-height: 400px; overflow-y: scroll;">
+        <ul class="list-group">
+          {% for discussion in discussions|sort(reverse=True, attribute='Timestamp') %}
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-md-6">
+                <p><strong>{{ discussion.user.Name }}</strong> - {{ discussion.Timestamp }}</p>
+                <p>{{ discussion.Comment }}</p>
+              </div>
+              <div class="col-md-6 text-right">
+                {% if discussion.Seen %}
+                  <span class="badge badge-success">Seen</span>
+                {% else %}
+                  {% if discussion.Sent %}
+                    <span class="badge badge-info">Sent</span>
+                  {% else %}
+                    <span class="badge badge-secondary">Pending</span>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
