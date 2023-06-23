@@ -16,6 +16,17 @@
   {% endfor %}
 {% endwith %}
 
+<div class="container-fluid p-0 m-0">
+  <nav class="breadcrumb bg-transparent shadow-none p-0 m-0" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="#">{{ project.ProjectName }}</a></li>
+      <li class="breadcrumb-item"><a href="#">{{ epic.EpicName }}</a></li>
+      <li class="breadcrumb-item"><a href="#">{{ story.StoryName }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ subtask.SubtaskName }}</li>
+    </ol>
+  </nav>  
+</div>
+
 <div class="container-fluid">
 
   <div class="row align-items-center">
