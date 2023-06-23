@@ -579,7 +579,7 @@ def subtask_details(subtask_id):
         db.session.add(discussion)
         db.session.commit()
         flash('Discussion added successfully.', 'success')
-        return redirect(url_for('subtask_discussion', subtask_id=subtask_id))
+        return redirect(request.referrer)
 
     # Fetch the discussions for the subtask
     discussions = Discussion.query.filter_by(SubtaskID=subtask_id).all()
@@ -606,7 +606,7 @@ def subtask_discussion(subtask_id):
         db.session.add(discussion)
         db.session.commit()
         flash('Discussion added successfully.', 'success')
-        return redirect(url_for('subtask_discussion', subtask_id=subtask_id))
+        return redirect(request.referrer)
 
     discussions = Discussion.query.filter_by(SubtaskID=subtask_id).all()
 
