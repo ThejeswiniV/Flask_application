@@ -33,7 +33,25 @@ Update Subtask - {{ subtask.SubtaskName }}
         <option value="{{ member.Email }}" {% if subtask.AssignedTo == member.Email or (not subtask.AssignedTo and loop.first) %}selected{% endif %}>{{ member.Email }}</option>
         {% endfor %}
       </select>
-    </div>     
+    </div>
+
+    <div class="form-floating mb-3">
+      <label for="SubtaskType">Subtask Type:</label>
+      <select id="SubtaskType" name="SubtaskType" class="form-select custom-select" required>
+        <option value="Task" {% if subtask.Type == "Task" %}selected{% endif %}>Task</option>
+        <option value="Bug" {% if subtask.Type == "Bug" %}selected{% endif %}>Bug</option>
+      </select>
+    </div>
+
+    <div class="form-floating mb-3">
+      <label for="SubtaskPriority">Subtask Priority:</label>
+      <select id="SubtaskPriority" name="SubtaskPriority" class="form-select custom-select" required>
+        <option value="Urgent" {% if subtask.Priority == "Urgent" %}selected{% endif %}>Urgent</option>
+        <option value="High" {% if subtask.Priority == "High" %}selected{% endif %}>High</option>
+        <option value="Medium" {% if subtask.Priority == "Medium" %}selected{% endif %}>Medium</option>
+        <option value="Low" {% if subtask.Priority == "Low" %}selected{% endif %}>Low</option>
+      </select>
+    </div>
 
     <div class="form-group">
       <label for="StartDate" class="form-label">Start Date:</label>

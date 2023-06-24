@@ -13,13 +13,13 @@ Create Sub-Task
         <label for="subtask_name">Sub-Task Name:</label>
         <input type="text" id="subtask_name" name="subtask_name" class="form-control" placeholder=" " required>
       </div>
-
+      
       <div class="form-floating mb-3">
         <label for="assigned_to">Assigned to:</label>
         <select id="assigned_to" name="assigned_to" class="form-select custom-select" required>
           <option value="">-- Select --</option>
           {% for member in Members %}
-          <option value="{{ member.Email }}">{{ member.Email.split('@')[0].lower()  }}</option>
+          <option value="{{ member.Email }}">{{ member.Email.split('@')[0].lower() }}</option>
           {% endfor %}
           {% for team_lead in Team_Lead %}
           <option value="{{ team_lead.Email }}">{{ team_lead.Email.split('@')[0].lower() }}</option>
@@ -30,6 +30,26 @@ Create Sub-Task
       <div class="form-floating mb-3">
         <label for="subtask_description">Sub-Task description:</label>
         <textarea id="subtask_description" name="subtask_description" class="form-control" placeholder=" " rows="5" required></textarea>
+      </div>
+      
+      <div class="form-floating mb-3">
+        <label for="subtask_priority">Subtask Priority:</label>
+        <select id="subtask_priority" name="subtask_priority" class="form-select custom-select" required>
+          <option value="">-- Select --</option>
+          <option value="Urgent">Urgent</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+      
+      <div class="form-floating mb-3">
+        <label for="subtask_type">Subtask Type:</label>
+        <select id="subtask_type" name="subtask_type" class="form-select custom-select" required>
+          <option value="">-- Select --</option>
+          <option value="Task">Task</option>
+          <option value="Bug">Bug</option>
+        </select>
       </div>
 
       <div class="form-floating mb-3">

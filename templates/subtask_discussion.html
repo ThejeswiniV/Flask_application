@@ -58,7 +58,7 @@
   <div class="col-sm-3">
     <div class="card text-center bg-primary text-white">
       <div class="card-body">
-        <h5 class="card-title">End Date</h5>
+        <h5 class="card-title">Due Date</h5>
         <p class="card-text">{{ subtask.EndDate }}</p>
       </div>
     </div>
@@ -74,7 +74,7 @@
   </div>
 
   <div class="col-sm-3">
-    <div class="card  text-center bg-primary text-white">
+    <div class="card text-center bg-primary text-white">
       <div class="card-body">
         <h5 class="card-title">Created By</h5>
         <p class="card-text">{{ subtask.CreatedBy }}</p>
@@ -83,7 +83,47 @@
   </div>
 </div>
 <br>
+
 <div class="row">
+  <div class="col-sm-3">
+    <div class="card text-center bg-primary text-white">
+      <div class="card-body">
+        <h5 class="card-title">Assigned To</h5>
+        <p class="card-text">{{ subtask.AssignedTo }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="card text-center bg-primary text-white">
+      <div class="card-body">
+        <h5 class="card-title">Subtask Status</h5>
+        <p class="card-text">{{ subtask.Status }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="card text-center bg-primary text-white">
+      <div class="card-body">
+        <h5 class="card-title">Subtask Type</h5>
+        <p class="card-text">{{ subtask.Type }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="card text-center bg-primary text-white">
+      <div class="card-body">
+        <h5 class="card-title">Subtask Priority</h5>
+        <p class="card-text">{{ subtask.Priority }}</p>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+<br>
+
+<div class="row">
+  
   <div class="col-sm-12">
     <div class="card text-white bg-secondary">
       <div class="card-body">

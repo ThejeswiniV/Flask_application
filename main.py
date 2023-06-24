@@ -92,7 +92,9 @@ class Subtask(db.Model):
     StartDate = db.Column(db.Date(), nullable=False)
     EndDate = db.Column(db.Date(), nullable=False)
     CreationDate = db.Column(db.DateTime(), nullable=False)
-    Status = db.Column(db.String(250), default='InProgress', nullable=False, )
+    Status = db.Column(db.String(250), default='InProgress', nullable=False)
+    Type = db.Column(db.String(250), default='Task', nullable=False)
+    Priority = db.Column(db.String(250), default='Medium', nullable=False)
     StoryID = db.Column(db.Integer(), db.ForeignKey('story.id'), nullable=False)
     discussions = db.relationship('Discussion', backref='subtask', foreign_keys='Discussion.SubtaskID', lazy=True)
 
@@ -498,8 +500,8 @@ def add_story(epic_id):
 
 @app.route('/add_subtask/<int:story_id>', methods=['GET', 'POST'])
 def add_subtask(story_id):
-    member=Users.query.filter_by(User_Role='Member').all()
-    team_lead=Users.query.filter_by(User_Role='Team Lead').all()
+    member = Users.query.filter_by(User_Role='Member').all()
+    team_lead = Users.query.filter_by(User_Role='Team Lead').all()
     if 'user_id' in session:
         user_id = session['user_id']
         user = Users.query.filter_by(id=user_id).first()
@@ -509,20 +511,32 @@ def add_subtask(story_id):
         subtask_description = request.form['subtask_description']
         start_date = dt.datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
         end_date = dt.datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
-        assignedto=request.form['assigned_to']
-        creationDate = dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30)
+        assigned_to = request.form['assigned_to']
+        subtask_priority = request.form['subtask_priority']
+        subtask_type = request.form['subtask_type']
+        creation_date = dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30)
 
-        # add the subtask to the database with the story ID
-        subtask = Subtask(SubtaskName=subtask_name, CreatedBy=created_by, SubtaskDescription=subtask_description,AssignedTo=assignedto,
-                          StartDate=start_date, EndDate=end_date, CreationDate=creationDate, StoryID=story_id)
+        # Add the subtask to the database with the story ID
+        subtask = Subtask(
+            SubtaskName=subtask_name,
+            CreatedBy=created_by,
+            SubtaskDescription=subtask_description,
+            AssignedTo=assigned_to,
+            StartDate=start_date,
+            EndDate=end_date,
+            CreationDate=creation_date,
+            Type=subtask_type,
+            Priority=subtask_priority,
+            StoryID=story_id
+        )
         db.session.add(subtask)
         db.session.commit()
 
         story = Story.query.filter_by(id=story_id).first()
-        flash('SubTask has been added Successfully', 'success')
+        flash('SubTask has been added successfully', 'success')
         return redirect(url_for('story_details', story_id=story_id))
 
-    return render_template('create_subtask.html', story_id=story_id, user=user,Members=member,Team_Lead=team_lead)
+    return render_template('create_subtask.html', story_id=story_id, user=user, Members=member, Team_Lead=team_lead)
 
 #DETAILS ROUTE
 @app.route('/project/<int:project_id>', methods=['POST', 'GET'])
@@ -589,7 +603,7 @@ def subtask_details(subtask_id):
             discussion.Seen = True  # Update Seen status for discussions seen by the receiver
     db.session.commit()
         
-    return render_template('subtask_details.html', subtask=subtask, epic=epic, story=story, user_id=user_id, project_name=project.ProjectName, epic_name=epic.EpicName, discussions=discussions)
+    return render_template('subtask_details.html', subtask=subtask, epic=epic, project=project, story=story, user_id=user_id, project_name=project.ProjectName, epic_name=epic.EpicName, discussions=discussions)
 
 @app.route('/subtask/<int:subtask_id>/discussion', methods=['GET', 'POST'])
 def subtask_discussion(subtask_id):
@@ -786,8 +800,8 @@ def update_story(story_id):
 @app.route('/subtask/<int:subtask_id>/update_subtask', methods=['GET', 'POST'])
 def update_subtask(subtask_id):
     subtask = Subtask.query.get(subtask_id)
-    member=Users.query.filter_by(User_Role='Member').all()
-    team_lead=Users.query.filter_by(User_Role='Team Lead').all()
+    member = Users.query.filter_by(User_Role='Member').all()
+    team_lead = Users.query.filter_by(User_Role='Team Lead').all()
     if request.method == 'POST':
         subtask.SubtaskName = request.form.get('SubtaskName')
         subtask.SubtaskDescription = request.form.get('SubtaskDescription')
@@ -795,11 +809,13 @@ def update_subtask(subtask_id):
             subtask.AssignedTo = request.form.get('AssignedTo')
         subtask.StartDate = dt.datetime.strptime(request.form['StartDate'], '%Y-%m-%d').date()
         subtask.EndDate = dt.datetime.strptime(request.form['EndDate'], '%Y-%m-%d').date()
+        subtask.Type = request.form.get('SubtaskType')  # Update Subtask Type
+        subtask.Priority = request.form.get('SubtaskPriority')  # Update Subtask Priority
         db.session.commit()
         flash('The SubTask has been updated successfully', 'success')
-        return redirect(url_for('story_details', story_id=subtask.StoryID ))
+        return redirect(url_for('story_details', story_id=subtask.StoryID))
 
-    return render_template('update_subtask.html', subtask=subtask, Members=member,Team_Lead=team_lead)
+    return render_template('update_subtask.html', subtask=subtask, Members=member, Team_Lead=team_lead)
 
 #Subtask Status View
 @app.route('/all_subtask_status')

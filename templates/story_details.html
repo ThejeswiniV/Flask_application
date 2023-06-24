@@ -123,6 +123,8 @@
         <th scope="col">Subtask Name</th>
         <th scope="col">Sub Task Description</th>
         <th scope="col">Assigned To</th>
+        <th scope="col">Type</th>
+        <th scope="col">Priority</th>
         <th scope="col">Start Date</th>
         <th scope="col">End Date</th>
         <th scope="col">Created By</th>
@@ -140,6 +142,8 @@
         <td><a href="{{ url_for('subtask_discussion', subtask_id=subtask.id) }}">{{ subtask.SubtaskName }}</a></td>
         <td>{{ subtask.SubtaskDescription }}</td>
         <td>{{ subtask.AssignedTo }}</td>
+        <td>{{ subtask.Type }}</td>
+        <td>{{ subtask.Priority }}</td>
         <td>{{ subtask.StartDate }}</td>
         <td>{{ subtask.EndDate }}</td>
         <td>{{ subtask.CreatedBy.split('@')[0].lower() }}</td>
@@ -149,10 +153,6 @@
         <td>
           <form action="{{ url_for('delete_subtask', subtask_id=subtask.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this subtask?');">
             <button type="submit" class="btn btn-danger btn-sm" {% if subtask.CreatedBy.split('@')[0].lower() != user.Email.split('@')[0].lower() and user.User_Role not in ['Admin'] %} disabled{% endif %}>Delete</button>
-          </form>
-          <br>
-          <form action="{{ url_for('update_subtask', subtask_id=subtask.id) }}" method="GET">
-            <button type="submit" class="btn btn-primary btn-sm" {% if subtask.CreatedBy.split('@')[0].lower() != user.Email.split('@')[0].lower() and user.User_Role not in ['Admin'] %} disabled{% endif %}>Update</button>
           </form>
         </td>
         {% endif %}

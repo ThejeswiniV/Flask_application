@@ -16,6 +16,17 @@
   {% endfor %}
 {% endwith %}
 
+<div class="container-fluid p-0 m-0">
+  <nav class="breadcrumb bg-transparent shadow-none p-0 m-0" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">{{ project.ProjectName }}</li>
+      <li class="breadcrumb-item">{{ epic.EpicName }}</li>
+      <li class="breadcrumb-item">{{ story.StoryName }}</li>
+      <li class="breadcrumb-item active" aria-current="page">{{ subtask.SubtaskName }}</li>
+    </ol>
+  </nav>  
+</div>
+
 <div class="container-fluid">
 
   <div class="row align-items-center">
@@ -80,6 +91,45 @@
 
 <br>
 <div class="row">
+  <div class="col-sm-3">
+    <div class="card text-center bg-primary text-white">
+      <div class="card-body">
+        <h5 class="card-title">Assigned To</h5>
+        <p class="card-text">{{ subtask.AssignedTo }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="card text-center bg-primary text-white">
+      <div class="card-body">
+        <h5 class="card-title">Subtask Status</h5>
+        <p class="card-text">{{ subtask.Status }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="card text-center bg-primary text-white">
+      <div class="card-body">
+        <h5 class="card-title">Subtask Type</h5>
+        <p class="card-text">{{ subtask.Type }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="card text-center bg-primary text-white">
+      <div class="card-body">
+        <h5 class="card-title">Subtask Priority</h5>
+        <p class="card-text">{{ subtask.Priority }}</p>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+<br>
+
+<div class="row">
+  
   <div class="col-sm-12">
     <div class="card text-white bg-secondary">
       <div class="card-body">
@@ -89,7 +139,6 @@
     </div>
   </div>
 </div>
-
 <br>
 <div class="row">
     <div class="col-md-12">
