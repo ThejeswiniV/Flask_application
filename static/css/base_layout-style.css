@@ -120,3 +120,34 @@ main {
     opacity: 0;
   }
 }
+
+
+
+/* table header fixed */
+.tableFixHead,
+.tableFixHeadEpic {
+  overflow: auto;
+  height: 100px;
+}
+
+.tableFixHead thead th,
+.tableFixHeader thead th {
+  position: sticky;
+  top: 0;
+}
+
+.tableFixHead thead th {
+  background-color: #3A75F5;
+}
+
+.tableFixHeader thead th {
+  background-color: #F9FAFB;
+}
+
+.table_body tr:nth-child(even) {
+  background-color: #f7f7f7;
+}
+
+.table_body tr:nth-child(odd) {
+  background-color: #fff;
+}

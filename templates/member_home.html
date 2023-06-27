@@ -5,6 +5,21 @@ Member Home
 {% endblock %}
 
 {% block main %}
+
+<style>
+  .nav-tabs .nav-item.show .nav-link,
+  .nav-tabs .nav-link {
+    background-color: #415a77;
+  }
+
+  .nav-tabs .nav-item.show .nav-link,
+  .nav-tabs .nav-link.active {
+    background-color: #e0e1dd;
+    color: #000 !important;
+    font-weight: 800;
+  }
+</style>
+
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% for category, message in messages %}
 <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
@@ -16,65 +31,110 @@ Member Home
 {% endfor %}
 {% endwith %}
 
-<h3>Sub Tasks Assigned to You</h3>
-{% if not assigned_subtasks_inprogress %}
-<p>You have no SubTasks Assigned To You at the moment. Come back and Check later.</p>
-{% else %}
-{% set sorted_assigned_subtasks_inprogress = assigned_subtasks_inprogress|sort(reverse=true, attribute='0.CreationDate') %}
-{% for subtask, project_name in sorted_assigned_subtasks_inprogress %}
-<div class="card bg-light col-10">
-  <div class="card-header bg-light">
-    <div class="col-md-10">Project Name: {{ project_name }}</div>
-  </div>
-  <div class="card-body">
-    <div class="d-flex justify-content-between">
-      <h5 class="card-title">{{ subtask.SubtaskName }}</h5>
-      <a href="{{ url_for('subtask_details', subtask_id=subtask.id) }}" class="btn btn-primary">Click to Complete SubTask</a>
-    </div>
-    <p class="card-text">{{ subtask.SubtaskDescription }}</p>
-  </div>
-  <div class="card-footer bg-light">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-4">Creation Date: {{ subtask.CreationDate.strftime('%d-%m-%Y') }}</div>
-        <div class="col-md-3">Due Date: {{ subtask.EndDate.strftime('%d-%m-%Y') }}</div>
-        <div class="col-md-3">Assigned By: {{ subtask.CreatedBy.split('@')[0].lower() }}</div>
-      </div>
-    </div>
-  </div>
-</div>
-<br>
-{% endfor %}
-{% endif %}
 
-<h3>Sub Tasks Completed by You</h3>
-{% if not assigned_subtasks_complete %}
-<p>You have not Completed any SubTasks. Your Completed SubTasks will appear here as you finish them.</p>
-{% else %}
-{% set sorted_assigned_subtasks_complete = assigned_subtasks_complete|sort(reverse=true, attribute='0.CreationDate') %}
-{% for subtask, project_name in sorted_assigned_subtasks_complete %}
-<div class="card bg-light col-10">
-  <div class="card-header bg-light">
-    <div class="col-md-10">Project Name: {{ project_name }}</div>
-  </div>
-  <div class="card-body">
-    <div class="d-flex justify-content-between">
-      <h5 class="card-title">{{ subtask.SubtaskName }}</h5>
-      <a href="{{ url_for('subtask_details', subtask_id=subtask.id) }}" class="btn btn-success">Click to View SubTask</a>
-    </div>
-    <p class="card-text">{{ subtask.SubtaskDescription }}</p>
-  </div>
-  <div class="card-footer bg-light">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-4">Creation Date: {{ subtask.CreationDate.strftime('%d-%m-%Y') }}</div>
-        <div class="col-md-3">Due Date: {{ subtask.EndDate.strftime('%d-%m-%Y') }}</div>
-        <div class="col-md-3">Assigned By: {{ subtask.CreatedBy.split('@')[0].lower() }}</div>
+<ul class="nav nav-tabs nav-justified" id="myTabs" role="tablist" style="justify-content: center;">
+  <li class="nav-item">
+    <a class="nav-link active bg-[#003049]" id="tab1" data-toggle="tab" href="#tab-content1">Sub Tasks Assigned to
+      You</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link bg-[#219ebc]" id="tab2" data-toggle="tab" href="#tab-content2">Sub Tasks Completed by You</a>
+  </li>
+</ul>
+
+
+<div class="tab-content my-4">
+  <div class="tab-pane fade show active" id="tab-content1">
+    {% if not assigned_subtasks_inprogress %}
+    <p class="font-medium">You have no SubTasks Assigned To You at the moment. Come back and Check later.</p>
+    {% else %}
+
+    <div class="grid md:grid-cols-3 grid-cols-1 gap-3">
+
+      {% set sorted_assigned_subtasks_inprogress = assigned_subtasks_inprogress|sort(reverse=true,
+      attribute='0.CreationDate')
+      %}
+      {% for subtask, project_name in sorted_assigned_subtasks_inprogress %}
+
+      <div class="shadow bg-white rounded-md p-3">
+        <div class="mb-2">
+          <div class="text-xl capitalize font-bold mb-2">{{ project_name }}
+            <span class="text-sm font-normal"> - Project Name</span>
+          </div>
+          <div class="text-md capitalize font-medium">{{ subtask.SubtaskName }}
+            <span class="text-sm font-normal"> - Subtask Name</span>
+          </div>
+        </div>
+        <div class="border-t pt-2">
+          <div class="mb-1">
+            <span class="font-bold text-[#0077b6]">Creation Date : </span>
+            <span class="text-sm font-medium">{{ subtask.CreationDate.strftime('%d-%m-%Y') }}</span>
+          </div>
+          <div class="mb-1">
+            <span class="font-bold text-[#0077b6]">Due Date : </span>
+            <span class="text-sm font-medium">{{ subtask.EndDate.strftime('%d-%m-%Y') }}</span>
+          </div>
+          <div class="mb-2">
+            <span class="font-bold text-[#0077b6]">Assigned By : </span>
+            <span class="text-sm font-medium">{{ subtask.CreatedBy.split('@')[0].lower() }}</span>
+          </div>
+        </div>
+        <div class="border-t pt-3">
+          <a href="{{ url_for('subtask_details', subtask_id=subtask.id) }}"
+            class="d-block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center">Click
+            to Complete SubTask</a>
+        </div>
       </div>
+      {% endfor %}
     </div>
+    {% endif %}
+  </div>
+
+    <div class="tab-pane fade show" id="tab-content2">
+      {% if not assigned_subtasks_complete %}
+      <p class="font-medium">You have not Completed any SubTasks. Your Completed SubTasks will appear here as you finish them.</p>
+      {% else %}
+      <div class="grid md:grid-cols-3 grid-cols-1 gap-3">
+    
+        {% set sorted_assigned_subtasks_complete = assigned_subtasks_complete|sort(reverse=true, attribute='0.CreationDate')
+        %}
+        {% for subtask, project_name in sorted_assigned_subtasks_complete %}
+    
+    
+        <div class="shadow bg-white rounded-md p-3">
+          <div class="mb-2">
+            <div class="text-xl capitalize font-bold mb-2">{{ project_name }}
+              <span class="text-sm font-normal"> - Project Name</span>
+            </div>
+            <div class="text-md capitalize font-medium">{{ subtask.SubtaskName }}
+              <span class="text-sm font-normal"> - Subtask Name</span>
+            </div>
+          </div>
+          <div class="border-t pt-2">
+            <div class="mb-1">
+              <span class="font-bold text-[#0077b6]">Creation Date : </span>
+              <span class="text-sm font-medium">{{ subtask.CreationDate.strftime('%d-%m-%Y') }}</span>
+            </div>
+            <div class="mb-1">
+              <span class="font-bold text-[#0077b6]">Due Date : </span>
+              <span class="text-sm font-medium">{{ subtask.EndDate.strftime('%d-%m-%Y') }}</span>
+            </div>
+            <div class="mb-2">
+              <span class="font-bold text-[#0077b6]">Assigned By : </span>
+              <span class="text-sm font-medium">{{ subtask.CreatedBy.split('@')[0].lower() }}</span>
+            </div>
+          </div>
+          <div class="border-t pt-3">
+            <a href="{{ url_for('subtask_details', subtask_id=subtask.id) }}"
+              class="d-block text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center">Click
+              to View
+              SubTask</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
   </div>
 </div>
-<br>
-{% endfor %}
-{% endif %}
+
 {% endblock %}

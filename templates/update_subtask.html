@@ -5,69 +5,97 @@ Update Subtask - {{ subtask.SubtaskName }}
 {% endblock %}
 
 {% block main %}
-<div class="text-center">
-  <h2>Update - {{ subtask.SubtaskName }}</h2>
-</div>
-<form method="POST" action="{{ url_for('update_subtask', subtask_id=subtask.id) }}" class="row g-3 justify-content-center">
-  <div class="col-md-6">
-    <div class="form-group">
-      <label for="SubtaskName" class="form-label">Subtask Name:</label>
-      <input type="text" id="SubtaskName" name="SubtaskName" class="form-control" value="{{ subtask.SubtaskName }}" required>
-    </div>
 
-    <div class="form-group">
-      <label for="SubtaskDescription" class="form-label">Subtask Description:</label>
-      <textarea id="SubtaskDescription" name="SubtaskDescription" rows="5" class="form-control" required>{{ subtask.SubtaskDescription }}</textarea>
-    </div>
+<h2 class="text-center text-xl uppercase font-bold mb-6">Update - {{ subtask.SubtaskName }}</h2>
 
-    <div class="form-group">
-      <label for="CreatedBy" class="form-label">Created By:</label>
-      <input type="text" id="CreatedBy" name="CreatedBy" class="form-control" value="{{ subtask.CreatedBy.split('@')[0].lower() }}" required disabled>
-    </div>
+<form method="POST" action="{{ url_for('update_subtask', subtask_id=subtask.id) }}"
+  class="max-w-screen-sm mx-auto my-0 bg-white p-3 rounded-md shadow-sm">
 
-    <div class="form-floating mb-3">
-      <label for="assigned_to">Assigned to:</label>
-      <select id="assigned_to" name="AssignedTo" class="form-select custom-select" required>
+  <div class="mb-3">
+    <label for="SubtaskName" class="block mb-2 text-sm font-medium text-gray-900">Subtask Name <span
+        class="text-red-600">*</span></label>
+    <input type="text" id="SubtaskName" name="SubtaskName"
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+      value="{{ subtask.SubtaskName }}" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="SubtaskDescription" class="block mb-2 text-sm font-medium text-gray-900">Subtask Description <span
+        class="text-red-600">*</span></label>
+    <textarea id="SubtaskDescription" name="SubtaskDescription" rows="5"
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+      required>{{ subtask.SubtaskDescription }}</textarea>
+  </div>
+
+  <div class="flex items-center md:flex-row flex-col mb-3">
+    <div class="w-full md:mb-0 mb-3">
+      <label for="CreatedBy" class="block mb-2 text-sm font-medium text-gray-900">Created By <span
+          class="text-red-600">*</span></label>
+      <input type="text" id="CreatedBy" name="CreatedBy"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+        value="{{ subtask.CreatedBy.split('@')[0].lower() }}" required disabled>
+    </div>
+    <div class="md:mx-3"></div>
+    <div class="w-full md:mb-0 mb-3">
+      <label for="assigned_to" class="block mb-2 text-sm font-medium text-gray-900">Assigned to <span
+          class="text-red-600">*</span></label>
+      <select id="assigned_to" name="AssignedTo"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+        required>
         <option value="">-- Select --</option>
         {% for member in Members %}
-        <option value="{{ member.Email }}" {% if subtask.AssignedTo == member.Email or (not subtask.AssignedTo and loop.first) %}selected{% endif %}>{{ member.Email }}</option>
+        <option value="{{ member.Email }}" {% if subtask.AssignedTo==member.Email or (not subtask.AssignedTo and
+          loop.first) %}selected{% endif %}>{{ member.Email }}</option>
         {% endfor %}
       </select>
     </div>
+  </div>
 
-    <div class="form-floating mb-3">
-      <label for="SubtaskType">Subtask Type:</label>
-      <select id="SubtaskType" name="SubtaskType" class="form-select custom-select" required>
-        <option value="Task" {% if subtask.Type == "Task" %}selected{% endif %}>Task</option>
-        <option value="Bug" {% if subtask.Type == "Bug" %}selected{% endif %}>Bug</option>
+  <div class="flex items-center md:flex-row flex-col mb-3">
+    <div class="w-full md:mb-0 mb-3">
+      <label for="SubtaskType" class="block mb-2 text-sm font-medium text-gray-900">Subtask Type <span
+          class="text-red-600">*</span></label>
+      <select id="SubtaskType" name="SubtaskType" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+        required>
+        <option value="Task" {% if subtask.Type=="Task" %}selected{% endif %}>Task</option>
+        <option value="Bug" {% if subtask.Type=="Bug" %}selected{% endif %}>Bug</option>
       </select>
     </div>
-
-    <div class="form-floating mb-3">
-      <label for="SubtaskPriority">Subtask Priority:</label>
-      <select id="SubtaskPriority" name="SubtaskPriority" class="form-select custom-select" required>
-        <option value="Urgent" {% if subtask.Priority == "Urgent" %}selected{% endif %}>Urgent</option>
-        <option value="High" {% if subtask.Priority == "High" %}selected{% endif %}>High</option>
-        <option value="Medium" {% if subtask.Priority == "Medium" %}selected{% endif %}>Medium</option>
-        <option value="Low" {% if subtask.Priority == "Low" %}selected{% endif %}>Low</option>
+    <div class="md:mx-3"></div>
+    <div class="w-full md:mb-0 mb-3">
+      <label for="SubtaskPriority" class="block mb-2 text-sm font-medium text-gray-900">Subtask Priority <span
+          class="text-red-600">*</span></label>
+      <select id="SubtaskPriority" name="SubtaskPriority" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+        required>
+        <option value="Urgent" {% if subtask.Priority=="Urgent" %}selected{% endif %}>Urgent</option>
+        <option value="High" {% if subtask.Priority=="High" %}selected{% endif %}>High</option>
+        <option value="Medium" {% if subtask.Priority=="Medium" %}selected{% endif %}>Medium</option>
+        <option value="Low" {% if subtask.Priority=="Low" %}selected{% endif %}>Low</option>
       </select>
-    </div>
-
-    <div class="form-group">
-      <label for="StartDate" class="form-label">Start Date:</label>
-      <input type="date" id="StartDate" name="StartDate" class="form-control" value="{{ subtask.StartDate }}" required>
-    </div>
-
-    <div class="form-group">
-      <label for="EndDate" class="form-label">End Date:</label>
-      <input type="date" id="EndDate" name="EndDate" class="form-control" value="{{ subtask.EndDate }}" required>
-    </div>
-
-    <div class="form-group">
-      <div class="d-grid">
-        <input type="submit" value="Update" class="btn btn-primary">
-      </div>
     </div>
   </div>
+
+
+  <div class="flex items-center md:flex-row flex-col mb-3">
+    <div class="w-full md:mb-0 mb-3">
+      <label for="StartDate" class="block mb-2 text-sm font-medium text-gray-900">Start Date <span
+          class="text-red-600">*</span></label>
+      <input type="date" id="StartDate" name="StartDate"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+        value="{{ subtask.StartDate }}" required>
+    </div>
+    <div class="md:mx-3"></div>
+    <div class="w-full md:mb-0 mb-3">
+      <label for="EndDate" class="block mb-2 text-sm font-medium text-gray-900">End Date <span
+          class="text-red-600">*</span></label>
+      <input type="date" id="EndDate" name="EndDate"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+        value="{{ subtask.EndDate }}" required>
+    </div>
+  </div>
+
+  <button type="submit"
+    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full  px-5 py-2.5 text-center">Update</button>
 </form>
+
 {% endblock %}

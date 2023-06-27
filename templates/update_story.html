@@ -5,41 +5,57 @@ Update Story - {{ story.StoryName }}
 {% endblock %}
 
 {% block main %}
-<div class="text-center">
-  <h2>Update {{ story.StoryName }}</h2>
-</div>
-<form method="POST" action="{{ url_for('update_story', story_id=story.id) }}" class="row g-3 justify-content-center">
-  <div class="col-md-6">
-    <div class="form-group">
-      <label for="StoryName" class="form-label">Story Name:</label>
-      <input type="text" id="StoryName" name="StoryName" class="form-control" value="{{ story.StoryName }}" required>
-    </div>
 
-    <div class="form-group">
-      <label for="StoryDescription" class="form-label">Story Description:</label>
-      <textarea id="StoryDescription" name="StoryDescription" rows="5" class="form-control" required>{{ story.StoryDescription }}</textarea>
-    </div>
+<h2 class="text-center text-xl uppercase font-bold mb-6">Update {{ story.StoryName }}</h2>
 
-    <div class="form-group">
-      <label for="CreatedBy" class="form-label">Created By:</label>
-      <input type="text" id="CreatedBy" name="CreatedBy" class="form-control" value="{{ story.CreatedBy }}" required disabled>
-    </div>
+<form method="POST" action="{{ url_for('update_story', story_id=story.id) }}"
+  class="max-w-screen-sm mx-auto my-0 bg-white p-3 rounded-md shadow-sm">
 
-    <div class="form-group">
-      <label for="StartDate" class="form-label">Start Date:</label>
-      <input type="date" id="StartDate" name="StartDate" class="form-control" value="{{ story.StartDate }}" required>
-    </div>
+  <div class="mb-3">
+    <label for="StoryName" class="block mb-2 text-sm font-medium text-gray-900">Story Name <span
+        class="text-red-600">*</span></label>
+    <input type="text" id="StoryName" name="StoryName"
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+      value="{{ story.StoryName }}" required>
+  </div>
 
-    <div class="form-group">
-      <label for="EndDate" class="form-label">End Date:</label>
-      <input type="date" id="EndDate" name="EndDate" class="form-control" value="{{ story.EndDate }}" required>
-    </div>
+  <div class="mb-3">
+    <label for="StoryDescription" class="block mb-2 text-sm font-medium text-gray-900">Story Description <span
+        class="text-red-600">*</span></label>
+    <textarea id="StoryDescription" name="StoryDescription" rows="5"
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+      required>{{ story.StoryDescription }}</textarea>
+  </div>
 
-    <div class="form-group">
-      <div class="d-grid">
-        <input type="submit" value="Update" class="btn btn-primary">
-      </div>
+  <div class="mb-3">
+    <label for="CreatedBy" class="block mb-2 text-sm font-medium text-gray-900">Created By <span
+        class="text-red-600">*</span></label>
+    <input type="text" id="CreatedBy" name="CreatedBy"
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+      value="{{ story.CreatedBy }}" required disabled>
+  </div>
+
+  <div class="flex items-center md:flex-row flex-col mb-3">
+    <div class="w-full md:mb-0 mb-3">
+      <label for="StartDate" class="block mb-2 text-sm font-medium text-gray-900">Start Date <span
+          class="text-red-600">*</span></label>
+      <input type="date" id="StartDate" name="StartDate"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+        value="{{ story.StartDate }}" required>
+    </div>
+    <div class="md:mx-3"></div>
+    <div class="w-full md:mb-0 mb-3">
+      <label for="EndDate" class="block mb-2 text-sm font-medium text-gray-900">End Date <span
+          class="text-red-600">*</span></label>
+      <input type="date" id="EndDate" name="EndDate"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+        value="{{ story.EndDate }}" required>
     </div>
   </div>
+
+  <button type="submit"
+    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full  px-5 py-2.5 text-center">Update</button>
 </form>
+
+
 {% endblock %}

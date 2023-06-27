@@ -16,50 +16,86 @@
       <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
       <!-- Main CSS -->
       <link href="{{ url_for('static', filename='css/base_layout-style.css') }}" rel="stylesheet">
+      <!-- Tailwind css -->
+      <script src="{{ url_for('static', filename='lib/tailwindcss.js') }}"></script>
+      <!-- Fontawesome Icon -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   </head>
   <body>
-    <nav class="navbar navbar-expand-md navbar-light bg-primary">
 
-      <!-- Logo  style="background-color: #396fdd;"-->
-      <a class="navbar-brand" href="{{ url_for('login') }}">
-        <img src="{{ url_for('static', filename='images/placeholder-logo.png') }}" alt="Logo">
-      </a>
-      <!-- Links -->
-      <ul class="navbar-nav">
-        {% if user.User_Role in ['Manager', 'Admin', 'Team Lead'] %}
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('show_projects') }}">Projects</a>
-        </li>
-        {% endif %}
-        {% if user.User_Role in ['Admin'] %}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Admin
+    <div class="shadow-md py-3 px-3 bg-[#017BFE] text-white">
+      <div class="max-w-screen-xl mx-auto my-0 flex justify-between items-center">
+    
+        <div class="flex items-center">
+          <!-- Logo  style="background-color: #396fdd;"-->
+          <a class="w-20" href="{{ url_for('show_user_home') }}">
+            <img src="{{ url_for('static', filename='images/placeholder-logo.png') }}" class="w-20" alt="Logo">
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="{{ url_for('show_users') }}">Role Control</a>
-            <a class="dropdown-item" href="{{ url_for('show_all_subtask_status') }}">Subtask Status</a>
-          </div>
-        </li>
-        {% endif %}
-        <li class="nav-item nav-link">
-          Role: {{ user.User_Role }}
-        </li>
-      </ul>
-      <!-- User login bar -->
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">{{ user.Name }}</a>
-          <div class="dropdown-menu dropdown-menu-right">
-            <a class="dropdown-item" href="{{ url_for('show_user_profile') }}">Profile</a>
-            <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
-          </div>
-        </li>
-      </ul>
-    </nav>
-    <main>
+    
+          <!-- Links -->
+          <ul class="flex items-center ml-10">
+            {% if user.User_Role in ['Manager', 'Admin', 'Team Lead'] %}
+            <li class="mr-3">
+              <a class="text-md font-medium hover:underline hover:text-white"
+                href="{{ url_for('show_projects') }}">Projects</a>
+            </li>
+            {% endif %}
+            {% if user.User_Role in ['Admin'] %}
+            <li class="mr-3 dropdown">
+              <div class="dropdown-toggle text-md font-medium cursor-pointer" data-toggle="dropdown">Admin</div>
+              <div class="dropdown-menu bg-white dropdown-menu-right border-none shadow-md">
+                <ul class="py-1 text-sm text-gray-700">
+                  <li>
+                    <a href="{{ url_for('show_users') }}"
+                      class="block px-4 py-2 hover:bg-gray-100 hover:text-black hover:no-underline border-b">Role
+                      Control</a>
+                  </li>
+                </ul>
+                <div class="">
+                  <a href="{{ url_for('show_all_subtask_status') }}"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:text-black hover:no-underline">Subtask Status</a>
+                </div>
+              </div>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+    
+    
+        <!-- User login bar -->
+        <ul class="">
+          <li class="dropdown">
+            <a class="dropdown-toggle uppercase text-sm font-medium no-underline flex items-center" href="#" id="navbardrop"
+              data-toggle="dropdown">
+              <img src="{{ url_for('static', filename='images/user.png') }}" alt="" class="w-10">
+            </a>
+            <div class="dropdown-menu dropdown-menu-right bg-white border-none shadow-md">
+              <div class="px-4 pt-1 pb-2 border-b text-gray-900">
+                <div class="text-md capitalize">{{user.Name}}</div>
+                <div class="font-medium truncate text-sm">{{user.User_Role}}</div>
+              </div>
+              <ul class="py-1 text-sm text-gray-700">
+                <li>
+                  <a href="{{ url_for('show_user_profile') }}"
+                    class="block px-4 py-2 hover:bg-gray-100 hover:text-black hover:no-underline"><i
+                      class="fa-regular fa-user"></i>&nbsp; Profile</a>
+                </li>
+              </ul>
+              <div class="">
+                <a href="{{ url_for('logout') }}"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-500 hover:text-white hover:no-underline">
+                  <i class="fa-solid fa-arrow-right-from-bracket"></i>&nbsp; Logout</a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="max-w-screen-xl mx-auto my-4 px-3">
       {% block main %}
       {% endblock %}
-    </main>
+    </div>
+
   </body>
 </html>
