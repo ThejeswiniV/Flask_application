@@ -162,7 +162,7 @@
     </thead>
     <tbody class="table_body">
 
-      {% for subtask in subtasks %}
+      {% for subtask in subtasks | sort(reverse=True, attribute='CreationDate') %}
       <tr class=" border-b">
         <th scope="row" class="px-6 py-4">{{ subtask.id }}</th>
         <td class="px-6 py-4">
