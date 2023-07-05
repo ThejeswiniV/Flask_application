@@ -65,7 +65,6 @@ Projects Home
     </div>
     {% endif %}
   </div>
-
     <div class="relative overflow-x-auto rounded-md border" style="height: 420px;">
       <table class="w-full text-sm text-left text-black tableFixHead">
         <thead class="text-xs text-white uppercase bg-gray-50">
@@ -79,6 +78,9 @@ Projects Home
             <th scope="col" class="px-6 py-3">Start Date</th>
             <th scope="col" class="px-6 py-3">End Date</th>
             <th scope="col" class="px-6 py-3">Creation Date</th>
+            {% if user.User_Role == 'Admin' %}
+            <th scope="col" class="px-6 py-3">Actions</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody class="table_body">
@@ -97,10 +99,15 @@ Projects Home
               {% endfor %}
             </td>
             <td class="px-6 py-4">{{ project.StartDate }}</td>
-            </td>
             <td class="px-6 py-4">{{ project.EndDate }}</td>
-            </td>
             <td class="px-6 py-4">{{ project.CreationDate.date() }}</td>
+            {% if user.User_Role == 'Admin' %}
+            <td class="px-6 py-4">
+              <form action="{{ url_for('delete_project', project_id=project.id) }}" method="POST">
+                <button type="submit" class="text-red-500">Delete</button>
+              </form>
+            </td>
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>
