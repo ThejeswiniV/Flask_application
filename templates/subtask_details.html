@@ -16,7 +16,6 @@
   {% endfor %}
 {% endwith %}
 
-
 <div class="flex justify-between lg:items-center my-4 mx-auto lg:flex-row flex-col">
   <h3 class="uppercase text-left font-bold">{{ subtask.SubtaskName }} - Details</h3>
   {% if user.User_Role in ['Member', 'Team Lead'] %}
@@ -38,8 +37,6 @@
   {% endif %}
 </div>
 
-
-
 <!-- <div class="container-fluid p-0 m-0">
   <nav class="breadcrumb bg-transparent shadow-none p-0 m-0" aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -50,7 +47,6 @@
     </ol>
   </nav>  
 </div> -->
-
 
 <div class="grid md:grid-cols-2 grid-cols-1 md:gap-4 gap-1 md:mb-5 mb-3 ">
   <div class="">
@@ -82,6 +78,18 @@
   </div>
   <div class="">
     <div class="bg-white text-black p-3  mb-1 shadow-sm rounded">
+      <h5 class="font-bold  text-[#264653]">Project Name : <span class="font-normal text-black">{{
+          project.ProjectName }}</span></h5>
+    </div>
+    <div class="bg-white text-black p-3  mb-1 shadow-sm rounded">
+      <h5 class="font-bold  text-[#264653]">Epic Name : <span class="font-normal text-black">{{
+          epic.EpicName }}</span></h5>
+    </div>
+    <div class="bg-white text-black p-3  mb-1 shadow-sm rounded">
+      <h5 class="font-bold  text-[#264653]">Story Name : <span class="font-normal text-black">{{
+          story.StoryName }}</span></h5>
+    </div>
+    <div class="bg-white text-black p-3  mb-1 shadow-sm rounded">
       <h5 class="font-bold  text-[#264653]">Subtask Type : <span class="font-normal text-black">{{
           subtask.Type }}</span></h5>
     </div>
@@ -89,18 +97,14 @@
       <h5 class="font-bold  text-[#264653]">Subtask Priority : <span class="font-normal text-black">{{
           subtask.Priority }}</span></h5>
     </div>
-    <div class="bg-white text-black p-3 shadow-sm rounded">
-      <h5 class="font-bold text-[#264653] pb-2">Subtask Description</h5>
-      <p class=" overflow-y-scroll text-justify pr-4 leading-7" style="height: 158px;">{{ subtask.SubtaskDescription }}
-      </p>
-    </div>
   </div>
 </div>
-
-
+<div class="bg-white text-black p-3 shadow-sm rounded w-full">
+  <h5 class="font-bold text-[#264653] pb-2">Subtask Description</h5>
+  <p class=" overflow-y-scroll text-justify pr-4 leading-7" style="height: 70px;">{{ subtask.SubtaskDescription }}
+  </p>
+</div>
 <br />
-<br />
-
 <div class="row">
     <div class="col-md-12">
       <div class="card">
@@ -155,4 +159,5 @@
   </div>
 </div>
 {% endif %}
+
 {% endblock %}
