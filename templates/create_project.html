@@ -72,7 +72,6 @@ Create Project
   </div>
 
 
-
   <div class="mb-3">
     <label for="description" class="block mb-2 text-sm font-medium text-gray-900">Project Description <span
         class="text-red-600">*</span></label>
@@ -90,14 +89,15 @@ Create Project
         required>
         <option value="">--Select--</option>
         {% for manager in Managers %}
-        <option value="{{ manager.Email }}">{{ manager.Email.split('@')[0].lower() }}</option>
+        <option value="{{ manager.id }}">{{ manager.Name}}</option>
         {% endfor %}
         {% for admin in Admins %}
-        <option value="{{ admin.Email }}">{{ admin.Email.split('@')[0].lower() }}</option>
+        <option value="{{ admin.id }}">{{ admin.Name }}</option>
         {% endfor %}
       </select>
     </div>
     <div class="md:mx-3"></div>
+
     <div class="w-full md:mb-0 mb-3">
       <label for="members" class="block mb-2 text-sm font-medium text-gray-900">Members <span
           class="text-red-600">*</span></label>
@@ -105,16 +105,12 @@ Create Project
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full md:h-12  p-2.5"
         required>
         <option value="">--Select--</option>
-        {% for member in Members %}
-        <option value="{{ member.Email }}">{{ member.Email.split('@')[0].lower() }}</option>
-        {% endfor %}
-        {% for team_lead in Team_Lead %}
-        <option value="{{ team_lead.Email }}">{{ team_lead.Email.split('@')[0].lower() }}</option>
+        {% for proj_user in proj_users %}
+        <option value="{{ proj_user.id }}">{{ proj_user.Name }}</option>
         {% endfor %}
       </select>
     </div>
   </div>
-
   <div class="flex items-center md:flex-row flex-col mb-3">
     <div class="w-full md:mb-0 mb-3">
       <label for="start-date" class="block mb-2 text-sm font-medium text-gray-900">Start Date <span

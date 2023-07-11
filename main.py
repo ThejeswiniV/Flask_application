@@ -18,8 +18,9 @@ import pymysql
 # instance of flask application
 app = Flask(__name__)
 app.secret_key = 'aef2f0e3683344d0991eaeb046d983eb'
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://gwc2023:gwc2023@34.93.9.124/gwcpmp"
-engine = create_engine('mysql+pymysql://gwc2023:gwc2023@34.93.9.124/gwcpmp')
+con_string = "mysql+pymysql://gwc2023:gwc2023@34.93.9.124/gwcpmpnew"
+app.config["SQLALCHEMY_DATABASE_URI"] = con_string
+engine = create_engine(con_string)
 db = SQLAlchemy(app)
 app.app_context().push()
 
@@ -28,7 +29,13 @@ class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email(), Length(max=250)])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Sign In')
- 
+
+project_members = db.Table(
+    'project_members',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('project_id', db.Integer, db.ForeignKey('project.id'), primary_key=True),
+)
+
 # Database Models
 class Users(db.Model):
     id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
@@ -39,29 +46,32 @@ class Users(db.Model):
     Designation = db.Column(db.String(250), nullable=False)
     Creation_Date = db.Column(db.DateTime(), default=dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30), nullable=False)
     
+    # Define the many-to-many relationship
+    projects = db.relationship('Project', secondary=project_members, backref=db.backref('users_in_projects', lazy='dynamic'))
     def __repr__(self):
-        return 'users.id'
-    
+        return str(self.id)    
+
 class Project(db.Model):
     id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
     ProjectName = db.Column(db.String(250), nullable=False)
     ProjectOwner = db.Column(db.String(250), nullable=False)
     ProjectDescription = db.Column(db.Text)
-    ProjectManager = db.Column(db.String(250), nullable=False)
-    CreatedBy = db.Column(db.String(250), nullable=False)
-    Members = db.Column(db.Text)
+    ProjectManager = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+    CreatedBy = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
     StartDate = db.Column(db.Date(), nullable=False)
     EndDate = db.Column(db.Date(), nullable=False)
     CreationDate = db.Column(db.DateTime(), default=dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30), nullable=False)
+    # Use 'users_projects'
+    users = db.relationship('Users', secondary=project_members, backref=db.backref('projects_users', lazy='dynamic'))
 
     def __repr__(self):
-        return 'project.id'
-
+        return str(self.id)
+    
 class Epic(db.Model):
     id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
     EpicName = db.Column(db.String(250), nullable=False)
     EpicDescription = db.Column(db.Text)
-    CreatedBy = db.Column(db.String(250), nullable=False)
+    CreatedBy = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
     StartDate = db.Column(db.Date(), nullable=False)
     EndDate = db.Column(db.Date(), nullable=False)
     CreationDate = db.Column(db.DateTime(), default=dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30), nullable=False)
@@ -74,7 +84,7 @@ class Story(db.Model):
     id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
     StoryName = db.Column(db.String(250), nullable=False)
     StoryDescription = db.Column(db.Text)
-    CreatedBy = db.Column(db.String(250), nullable=False)
+    CreatedBy = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
     StartDate = db.Column(db.Date(), nullable=False)
     EndDate = db.Column(db.Date(), nullable=False)
     CreationDate = db.Column(db.DateTime(), default=dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30), nullable=False)
@@ -87,8 +97,8 @@ class Subtask(db.Model):
     id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
     SubtaskName = db.Column(db.String(250), nullable=False)
     SubtaskDescription = db.Column(db.Text)
-    AssignedTo = db.Column(db.String(250), nullable=False)
-    CreatedBy = db.Column(db.String(250), nullable=False)
+    AssignedTo = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+    CreatedBy = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
     StartDate = db.Column(db.Date(), nullable=False)
     EndDate = db.Column(db.Date(), nullable=False)
     CreationDate = db.Column(db.DateTime(), nullable=False)
@@ -114,7 +124,6 @@ class Discussion(db.Model):
     def __repr__(self):
         return 'discussion.id'
 
-
 #Public User Restrictions    
 @app.before_request
 def require_login():
@@ -122,8 +131,7 @@ def require_login():
     if request.endpoint not in allowed_routes and 'user_id' not in session:
         return redirect(url_for('login'))
 
-#Site User Role Based restrictions
-#Member Restrcitions
+#Member Restrictions
 @app.before_request
 def restrict_access_member():
     user_id = session.get('user_id')
@@ -194,7 +202,6 @@ def login():
     
     form = LoginForm()
     return render_template('login_page.html', form=form)
-
 
 @app.route('/register', methods=['POST','GET'])
 def show_register():
@@ -291,9 +298,9 @@ def show_user_home():
         user_id = session['user_id']
         user = Users.query.filter_by(id=user_id).first()
         if user.User_Role == 'Member':
-            assigned_subtasks_inprogress = Subtask.query.filter_by(AssignedTo=user.Email).filter_by(Status='InProgress').all()
-            assigned_subtasks_complete = Subtask.query.filter_by(AssignedTo=user.Email).filter_by(Status='Complete').all()
-            
+            assigned_subtasks_inprogress = Subtask.query.filter_by(AssignedTo=user.id).filter_by(Status='InProgress').all()
+            assigned_subtasks_complete = Subtask.query.filter_by(AssignedTo=user.id).filter_by(Status='Complete').all()
+            subtask_assigned_to_users = [Users.query.get(subtaskone.CreatedBy).Name for subtaskone in subtask]
             # Fetch the project names for assigned subtasks in progress
             assigned_subtasks_inprogress_with_project = []
             for subtask in assigned_subtasks_inprogress:
@@ -313,11 +320,10 @@ def show_user_home():
                                    projects=projects_data,
                                    user=user, subtask=subtask,
                                    assigned_subtasks_inprogress=assigned_subtasks_inprogress_with_project,
-                                   assigned_subtasks_complete=assigned_subtasks_complete_with_project)
+                                   assigned_subtasks_complete=assigned_subtasks_complete_with_project, subtask_assigned_to_users= subtask_assigned_to_users)
         
     return render_template('dashboard.html', projects=projects_data, total_unique_projects = total_unique_projects, total_unique_epics = total_unique_epics, total_unique_stories = total_unique_stories, total_unique_subtasks = total_unique_subtasks, user_role_json=user_role_json, subtask_fig_json=subtask_fig_json)
 
-#PROJECTS PAGE:
 @app.route('/projects')
 def show_projects():
     if 'user_id' not in session:
@@ -327,15 +333,24 @@ def show_projects():
     user_id = session['user_id']
     user = Users.query.get(user_id)
 
+    projects_data = []
     if user.User_Role == 'Admin':
         projects_data = Project.query.all()
     elif user.User_Role == 'Manager':
-        user_email = user.Email.split('@')[0].lower()
-        projects_data = Project.query.filter_by(ProjectManager=user_email).all()
-    else:
-        projects_data = []
+        projects_data = Project.query.filter_by(ProjectManager=user_id).all()
+    elif user.User_Role == 'Team Lead':
+        projects_data = Project.query.filter(Project.users.any(id=user_id)).all()
 
-    return render_template('home_project.html', projects=projects_data)
+    project_managers = {}
+    created_by_users = {}
+
+    for project in projects_data:
+        project_manager = Users.query.get(project.ProjectManager)
+        created_by_user = Users.query.get(project.CreatedBy)
+        project_managers[project.id] = project_manager.Name
+        created_by_users[project.id] = created_by_user.Name
+
+    return render_template('home_project.html', projects=projects_data, project_managers=project_managers, created_by_users=created_by_users)
 
 #USER CONTROL PAGE FOR ADMIN
 @app.route('/user_control')
@@ -424,8 +439,9 @@ def register():
 def add_project():
     managers = Users.query.filter_by(User_Role='Manager').all()
     admins = Users.query.filter_by(User_Role='Admin').all()
-    member=Users.query.filter_by(User_Role='Member').all()
-    team_lead=Users.query.filter_by(User_Role='Team Lead').all()
+    proj_users = Users.query.all()
+#   members = Users.query.filter_by(User_Role='Member').all()
+#   team_lead = Users.query.filter_by(User_Role='Team Lead').all()
     if 'user_id' in session:
         user_id = session['user_id']
         user = Users.query.filter_by(id=user_id).first()
@@ -434,21 +450,39 @@ def add_project():
         owner = request.form['owner']
         description = request.form['description']
         manager = request.form['manager']
-        createdby=user.Email
-        members = request.form.getlist('members')
+        createdby = user.id
+        member_ids = request.form.getlist('members')
         start_date = dt.datetime.strptime(request.form['start-date'], '%Y-%m-%d').date()
         end_date = dt.datetime.strptime(request.form['end-date'], '%Y-%m-%d').date()
-        creationDate = dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30)
+        creation_date = dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30)
 
-        project = Project(ProjectName=name, ProjectOwner=owner, ProjectDescription=description,
-                          ProjectManager=manager, CreatedBy=createdby, Members=', '.join(members),
-                          StartDate=start_date, EndDate=end_date, CreationDate=creationDate)
+        # Create the project instance
+        project = Project(
+            ProjectName=name,
+            ProjectOwner=owner,
+            ProjectDescription=description,
+            ProjectManager=manager,
+            CreatedBy=createdby,
+            StartDate=start_date,
+            EndDate=end_date,
+            CreationDate=creation_date
+        )
+
         db.session.add(project)
         db.session.commit()
+
+        # Add members to the project
+        for member_id in member_ids:
+            member_id = Users.query.filter_by(id=member_id).first()
+            if member_id:
+                project.users.append(member_id)
+
+        db.session.commit()
+
         flash('Your Project has been Created Successfully!!', 'success')
         return redirect(url_for('show_projects'))
     else:
-        return render_template('create_project.html', Managers=managers, Admins=admins, Members=member, Team_Lead=team_lead, user=user)
+        return render_template('create_project.html', Managers=managers, Admins=admins, proj_users= proj_users, user=user)
 
 @app.route('/add_epic/<int:project_id>', methods=['GET', 'POST'])
 def add_epic(project_id):
@@ -457,7 +491,7 @@ def add_epic(project_id):
         user = Users.query.filter_by(id=user_id).first()
     if request.method == 'POST':
         epic_name = request.form['epic_name']
-        created_by = user.Email.split('@')[0].lower()
+        created_by = user.id
         epic_description = request.form['epic_description']
         start_date = dt.datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
         end_date = dt.datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
@@ -480,7 +514,7 @@ def add_story(epic_id):
         user = Users.query.filter_by(id=user_id).first()
     if request.method == 'POST':
         story_name = request.form['story_name']
-        created_by = user.Name
+        created_by = user.id
         story_description = request.form['story_description']
         start_date = dt.datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
         end_date = dt.datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
@@ -500,14 +534,16 @@ def add_story(epic_id):
 
 @app.route('/add_subtask/<int:story_id>', methods=['GET', 'POST'])
 def add_subtask(story_id):
-    member = Users.query.filter_by(User_Role='Member').all()
-    team_lead = Users.query.filter_by(User_Role='Team Lead').all()
+    story = Story.query.filter_by(id=story_id).first()
+    epic = Epic.query.get(story.EpicID)
+    project = Project.query.get(epic.ProjectID)
+    all_users = project.users
     if 'user_id' in session:
         user_id = session['user_id']
         user = Users.query.filter_by(id=user_id).first()
     if request.method == 'POST':
         subtask_name = request.form['subtask_name']
-        created_by = user.Email
+        created_by = user.id
         subtask_description = request.form['subtask_description']
         start_date = dt.datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
         end_date = dt.datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
@@ -536,29 +572,47 @@ def add_subtask(story_id):
         flash('SubTask has been added successfully', 'success')
         return redirect(url_for('story_details', story_id=story_id))
 
-    return render_template('create_subtask.html', story_id=story_id, user=user, Members=member, Team_Lead=team_lead)
+    return render_template('create_subtask.html', story_id=story_id, user=user, all_users=all_users)
 
 #DETAILS ROUTE
 @app.route('/project/<int:project_id>', methods=['POST', 'GET'])
 def project_details(project_id):
     project = Project.query.get_or_404(project_id)
     epics_data = Epic.query.filter_by(ProjectID=project_id).all()
-    return render_template('project_details.html', project=project, epics=epics_data, project_name=project.ProjectName)
+
+    project_manager = Users.query.get(project.ProjectManager)
+    created_by_user = Users.query.get(project.CreatedBy)
+    epic_created_by_users = [Users.query.get(epic.CreatedBy) for epic in epics_data]
+
+    # Zip epics_data and epic_created_by_users together
+    epic_data_with_users = zip(epics_data, epic_created_by_users)
+    
+    return render_template('project_details.html', project=project, epics=epics_data, project_name=project.ProjectName, project_manager=project_manager, created_by_user=created_by_user,epic_data_with_users=epic_data_with_users,)
 
 @app.route('/epic/<int:epic_id>', methods=['GET'])
 def epic_details(epic_id):
     epic = Epic.query.get_or_404(epic_id)
     project = Project.query.get_or_404(epic.ProjectID)
     stories_data = Story.query.filter_by(EpicID=epic_id).all()
-    return render_template('epic_details.html', epic=epic, project_name=project.ProjectName, stories=stories_data)
+    created_by_user = Users.query.get(epic.CreatedBy)
+    story_created_by_users = [Users.query.get(story.CreatedBy) for story in stories_data]
+    # Zip epics_data and epic_created_by_users together
+    story_data_with_users = zip(stories_data, story_created_by_users)
+    
+    return render_template('epic_details.html', epic=epic, project_name=project.ProjectName, stories=stories_data, created_by_user=created_by_user, story_data_with_users=story_data_with_users)
 
 @app.route('/story/<int:story_id>', methods=['GET'])
 def story_details(story_id):
     story = Story.query.get_or_404(story_id)
     epic = Epic.query.get_or_404(story.EpicID)
     project = Project.query.get_or_404(epic.ProjectID)
-    subtasks_data = Subtask.query.filter_by(StoryID=story_id).all()
-    return render_template('story_details.html', epic=epic, project=project, project_name=project.ProjectName, epic_name=epic.EpicName, story=story, subtasks=subtasks_data)
+    subtasks_data = Subtask.query.filter_by(StoryID=story_id).order_by(Subtask.CreationDate.desc()).all()
+    created_by_user = Users.query.get(story.CreatedBy)
+    subtask_assigned_to_users = [Users.query.get(subtask.AssignedTo) for subtask in subtasks_data]
+    subtask_created_by_users = [Users.query.get(subtask.CreatedBy) for subtask in subtasks_data]
+    # Zip subtasks_data, subtask_assigned_to_users, and subtask_created_by_users together
+    subtask_data_with_users = zip(subtasks_data, subtask_assigned_to_users, subtask_created_by_users)
+    return render_template('story_details.html', epic=epic, project=project, project_name=project.ProjectName, epic_name=epic.EpicName, story=story, subtasks=subtasks_data, created_by_user=created_by_user, subtask_data_with_users=subtask_data_with_users)
 
 @app.route('/subtasks/<int:subtask_id>', methods=['GET', 'POST'])
 def subtask_details(subtask_id):    
@@ -566,13 +620,15 @@ def subtask_details(subtask_id):
     story = Story.query.get_or_404(subtask.StoryID)
     epic = Epic.query.get_or_404(story.EpicID)
     project = Project.query.get_or_404(epic.ProjectID)
+    created_by_user = Users.query.get(subtask.CreatedBy)
+    assigned_to_user = Users.query.get(subtask.AssignedTo)
     user_id = session['user_id']  # Retrieve the user ID from the session
     timestamp = dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30)
     user = None
     if 'user_id' in session:
         user_id = session['user_id']
         user = Users.query.filter_by(id=user_id).first()
-        if user.User_Role == 'Member' and user.Email != subtask.AssignedTo:
+        if user.User_Role == 'Member' and user.id != subtask.AssignedTo:
             abort(403)
 
     if request.method == 'POST':
@@ -603,7 +659,7 @@ def subtask_details(subtask_id):
             discussion.Seen = True  # Update Seen status for discussions seen by the receiver
     db.session.commit()
         
-    return render_template('subtask_details.html', subtask=subtask, epic=epic, project=project, story=story, user_id=user_id, project_name=project.ProjectName, epic_name=epic.EpicName, discussions=discussions)
+    return render_template('subtask_details.html', subtask=subtask, epic=epic, project=project, story=story, user_id=user_id, project_name=project.ProjectName, epic_name=epic.EpicName, discussions=discussions, created_by_user = created_by_user, assigned_to_user = assigned_to_user)
 
 @app.route('/subtask/<int:subtask_id>/discussion', methods=['GET', 'POST'])
 def subtask_discussion(subtask_id):
@@ -612,6 +668,8 @@ def subtask_discussion(subtask_id):
     epic = Epic.query.get_or_404(story.EpicID)
     project = Project.query.get_or_404(epic.ProjectID)
     user_id = session['user_id']
+    created_by_user = Users.query.get(subtask.CreatedBy)
+    assigned_to_user = Users.query.get(subtask.AssignedTo)
     timestamp = dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30)
 
     if request.method == 'POST':
@@ -629,7 +687,7 @@ def subtask_discussion(subtask_id):
             discussion.Seen = True  # Update Seen status for discussions seen by the receiver
     db.session.commit()
 
-    return render_template('subtask_discussion.html', epic=epic, project=project, story=story, subtask=subtask, discussions=discussions, user_id=user_id)
+    return render_template('subtask_discussion.html', epic=epic, project=project, story=story, subtask=subtask, discussions=discussions, user_id=user_id, created_by_user= created_by_user, assigned_to_user =assigned_to_user)
 
 @app.route('/subtask/<int:subtask_id>/add_comment', methods=['POST'])
 def add_comment(subtask_id):
@@ -648,6 +706,8 @@ def add_comment(subtask_id):
 @app.route('/project/<int:project_id>/delete_project', methods=['POST'])
 def delete_project(project_id):
     project = Project.query.get_or_404(project_id)
+
+    project.users.clear()
 
     # Delete discussions
     discussions = Discussion.query \
@@ -704,6 +764,7 @@ def delete_epic(project_id, epic_id):
     db.session.delete(epic)
     db.session.commit()
 
+    flash('Epic deleted successfully.', 'success') 
     return redirect(url_for('project_details', project_id=project_id))
 
 @app.route('/delete_story/<int:story_id>/',methods=['POST'])
@@ -733,38 +794,42 @@ def delete_subtask(subtask_id):
     flash('Subtask has been deleted.', 'success')
     return redirect(url_for('story_details', story_id=subtask.StoryID))
 
-#UPDATE ROUTES
 @app.route('/project/<int:project_id>/update_project', methods=['GET', 'POST'])
 def update_project(project_id):
     project = Project.query.get_or_404(project_id)
     managers = Users.query.filter_by(User_Role='Manager').all()
     admins = Users.query.filter_by(User_Role='Admin').all()
-    members = Users.query.filter_by(User_Role='Member').all()
-    team_leads = Users.query.filter_by(User_Role='Team Lead').all()
+    proj_users = Users.query.all()
+
+    # Get the selected member IDs for pre-selection
+    member_ids = [user.id for user in project.users]
 
     if request.method == 'POST':
-        if 'ProjectName' in request.form:
-            project.ProjectName = request.form['ProjectName']
-        if 'ProjectOwner' in request.form:
-            project.ProjectOwner = request.form['ProjectOwner']
-        if 'ProjectDescription' in request.form:
-            project.ProjectDescription = request.form['ProjectDescription']
-        if 'ProjectManager' in request.form:
-            project.ProjectManager = request.form['ProjectManager']
-        if 'CreatedBy' in request.form:
-            project.CreatedBy = request.form['CreatedBy']
-        if 'members' in request.form:
-            selected_members = request.form.getlist('members')  # Get list of selected member emails
-            project.Members = ','.join(selected_members)  # Convert the list to a comma-separated string
-        if 'StartDate' in request.form:
-            project.StartDate = dt.datetime.strptime(request.form['StartDate'], '%Y-%m-%d').date()
-        if 'EndDate' in request.form:
-            project.EndDate = dt.datetime.strptime(request.form['EndDate'], '%Y-%m-%d').date()
+        # Retrieve form data
+        project.ProjectName = request.form['ProjectName']
+        project.ProjectOwner = request.form['ProjectOwner']
+        project.ProjectDescription = request.form['ProjectDescription']
+        project.ProjectManager = request.form['ProjectManager']
+        member_ids = request.form.getlist('members')  # Get list of selected member IDs
+        project.StartDate = dt.datetime.strptime(request.form['StartDate'], '%Y-%m-%d').date()
+        project.EndDate = dt.datetime.strptime(request.form['EndDate'], '%Y-%m-%d').date()
+
+        # Update the project and its members
         db.session.commit()
+
+        # Clear existing members and add the selected members
+        project.users.clear()
+        for member_id in member_ids:
+            member = Users.query.get(member_id)
+            if member:
+                project.users.append(member)
+        db.session.commit()
+
         flash('Project details updated successfully!', 'success')
         return redirect(url_for('project_details', project_id=project.id))
 
-    return render_template('update_project.html', project=project, Managers=managers, Admins=admins, Members=members, Team_Lead=team_leads)
+    return render_template('update_project.html', project=project, Managers=managers, Admins=admins,
+                           proj_users=proj_users, member_ids=member_ids)
 
 @app.route('/epic/<int:epic_id>/update_epic', methods=['GET', 'POST'])
 def update_epic(epic_id):
@@ -800,13 +865,16 @@ def update_story(story_id):
 @app.route('/subtask/<int:subtask_id>/update_subtask', methods=['GET', 'POST'])
 def update_subtask(subtask_id):
     subtask = Subtask.query.get(subtask_id)
-    member = Users.query.filter_by(User_Role='Member').all()
-    team_lead = Users.query.filter_by(User_Role='Team Lead').all()
+    story = Story.query.get(subtask.StoryID)
+    epic = Epic.query.get(story.EpicID)
+    project = Project.query.get(epic.ProjectID)
+    all_users = project.users
+    created_by_user = Users.query.get(subtask.CreatedBy)
     if request.method == 'POST':
         subtask.SubtaskName = request.form.get('SubtaskName')
         subtask.SubtaskDescription = request.form.get('SubtaskDescription')
         if 'AssignedTo' in request.form:
-            subtask.AssignedTo = request.form.get('AssignedTo')
+            subtask.AssignedTo= request.form.get('AssignedTo')
         subtask.StartDate = dt.datetime.strptime(request.form['StartDate'], '%Y-%m-%d').date()
         subtask.EndDate = dt.datetime.strptime(request.form['EndDate'], '%Y-%m-%d').date()
         subtask.Type = request.form.get('SubtaskType')  # Update Subtask Type
@@ -815,19 +883,31 @@ def update_subtask(subtask_id):
         flash('The SubTask has been updated successfully', 'success')
         return redirect(url_for('story_details', story_id=subtask.StoryID))
 
-    return render_template('update_subtask.html', subtask=subtask, Members=member, Team_Lead=team_lead)
+    return render_template('update_subtask.html', subtask=subtask, all_users=all_users, created_by_user= created_by_user)
 
 #Subtask Status View
 @app.route('/all_subtask_status')
 def show_all_subtask_status():
     incomplete_subtasks = Subtask.query.filter(Subtask.Status == 'InProgress', Subtask.EndDate < dt.date.today()).all()
+    incomplete_subtask_assigned_to_users = [Users.query.get(incomplete_subtask.AssignedTo) for incomplete_subtask in incomplete_subtasks]
+    incomplete_subtask_created_by_users = [Users.query.get(incomplete_subtask.CreatedBy) for incomplete_subtask in incomplete_subtasks]
+    incomplete_subtask_data_with_users = zip(incomplete_subtasks, incomplete_subtask_assigned_to_users, incomplete_subtask_created_by_users)
+    
     in_progress_subtasks = Subtask.query.filter(Subtask.Status == 'InProgress', Subtask.EndDate >= dt.date.today()).all()
+    in_progress_subtask_assigned_to_users = [Users.query.get(in_progress_subtask.AssignedTo) for in_progress_subtask in in_progress_subtasks]
+    in_progress_subtask_created_by_users = [Users.query.get(in_progress_subtask.CreatedBy) for in_progress_subtask in in_progress_subtasks]
+    in_progress_subtask_data_with_users = zip(in_progress_subtasks, in_progress_subtask_assigned_to_users, in_progress_subtask_created_by_users)
+    
     completed_subtasks = Subtask.query.filter(Subtask.Status == 'Complete').all()
+    completed_subtask_subtask_assigned_to_users = [Users.query.get(completed_subtask.AssignedTo) for completed_subtask in completed_subtasks]
+    completed_subtask_created_by_users = [Users.query.get(completed_subtask.CreatedBy) for completed_subtask in completed_subtasks]
+    completed_subtask_data_with_users = zip(completed_subtasks, completed_subtask_subtask_assigned_to_users, completed_subtask_created_by_users)
 
     return render_template('subtasks_all_status.html',
-                           incomplete_subtasks=incomplete_subtasks,
-                           in_progress_subtasks=in_progress_subtasks,
-                           completed_subtasks=completed_subtasks)
+                           incomplete_subtask_data_with_users = incomplete_subtask_data_with_users,
+                           in_progress_subtask_data_with_users = in_progress_subtask_data_with_users,
+                           completed_subtask_data_with_users = completed_subtask_data_with_users
+                           )
 
 if __name__ == "__main__":
     app.run(debug=True)

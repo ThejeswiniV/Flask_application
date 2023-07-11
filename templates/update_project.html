@@ -93,44 +93,32 @@ Update Project - {{ project.ProjectName }}
 
     <div class="flex items-center md:flex-row flex-col mb-3">
         <div class="w-full md:mb-0 mb-3">
-            <label for="manager" class="block mb-2 text-sm font-medium text-gray-900">Project Manager <span
-                    class="text-red-600">*</span></label>
-            <select id="manager" name="ProjectManager"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full md:h-12 p-2.5 "
-                required>
-                <option value="">--Select--</option>
-                {% for manager in Managers %}
-                <option value="{{ manager.Email.split('@')[0].lower() }}" {% if
-                    project.ProjectManager==manager.Email.split('@')[0].lower() %}selected{% endif %}>{{
-                    manager.Email.split('@')[0].lower() }}</option>
-                {% endfor %}
-                {% for admin in Admins %}
-                <option value="{{ admin.Email.split('@')[0].lower() }}" {% if
-                    project.ProjectManager==admin.Email.split('@')[0].lower() %}selected{% endif %}>{{
-                    admin.Email.split('@')[0].lower() }}</option>
-                {% endfor %}
-            </select>
-        </div>
+            <label for="manager" class="block mb-2 text-sm font-medium text-gray-900">Project Manager <span class="text-red-600">*</span></label>
+            <select id="manager" name="ProjectManager" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full md:h-12 p-2.5" required>
+              <option value="">--Select--</option>
+              {% for manager in Managers %}
+                <option value="{{ manager.id }}" {% if manager.id == project.ProjectManager %}selected{% endif %}>{{ manager.Name }}</option>
+              {% endfor %}
+              {% for admin in Admins %}
+                <option value="{{ admin.id }}" {% if admin.id == project.ProjectManager %}selected{% endif %}>{{ admin.Name }}</option>
+              {% endfor %}
+            </select>            
+          </div>                    
         <div class="md:mx-3"></div>
         <div class="w-full md:mb-0 mb-3">
-            <label for="members" class="block mb-2 text-sm font-medium text-gray-900">Members <span
-                    class="text-red-600">*</span></label>
-            <select id="members" name="members" multiple
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full md:h-12  p-2.5"
-                required>
-                <option value="">--Select--</option>
-                {% for member in Members %}
-                <option value="{{ member.Email}}" {% if member.Email in project.Members %}selected{% endif %}>{{
-                    member.Email }}
-                </option>
-                {% endfor %}
-                {% for team_lead in Team_Lead %}
-                <option value="{{ team_lead.Email }}" {% if team_lead.Email in project.Members %}selected{% endif %}>{{
-                    team_lead.Email }}</option>
-                {% endfor %}
-            </select>
+          <label for="members" class="block mb-2 text-sm font-medium text-gray-900">Members <span
+              class="text-red-600">*</span></label>
+          <select id="members" name="members" multiple
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full md:h-12  p-2.5"
+            required>
+            <option value="">--Select--</option>
+            {% for proj_user in proj_users %}
+            <option value="{{ proj_user.id }}" {% if proj_user.id in member_ids %}selected{% endif %}>{{ proj_user.Name }}</option>
+            {% endfor %}
+          </select>
         </div>
-    </div>
+      </div>
+      
 
     <div class="flex items-center md:flex-row flex-col mb-3">
         <div class="w-full md:mb-0 mb-3">

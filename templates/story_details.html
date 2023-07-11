@@ -111,7 +111,7 @@
           story.CreationDate.date() }}</span></h5>
     </div>
     <div class="bg-white text-black p-3  mb-1 shadow-sm rounded">
-      <h5 class="font-bold  text-[#264653]">Created By : <span class="font-normal text-black">{{ story.CreatedBy
+      <h5 class="font-bold  text-[#264653]">Created By : <span class="font-normal text-black">{{ created_by_user.Name
           }}</span></h5>
     </div>
   </div>
@@ -161,28 +161,27 @@
       </tr>
     </thead>
     <tbody class="table_body">
-
-      {% for subtask in subtasks | sort(reverse=True, attribute='CreationDate') %}
+      {% for subtask, assigned_to_user, subtask_created_by_user in subtask_data_with_users %}
       <tr class=" border-b">
         <th scope="row" class="px-6 py-4">{{ subtask.id }}</th>
         <td class="px-6 py-4">
           <a href="{{ url_for('subtask_discussion', subtask_id=subtask.id) }}" class="text-blue-500 uppercase font-medium">{{ subtask.SubtaskName }}</a>
         </td>
         <!-- <td class="px-6 py-4 h-28 overflow-y-scroll">{{ subtask.SubtaskDescription }}</td> -->
-        <td class="px-6 py-4">{{ subtask.AssignedTo }}</td>
+        <td class="px-6 py-4">{{ assigned_to_user.Name }}</td>
         <td class="px-6 py-4">{{ subtask.Type }}</td>
         <td class="px-6 py-4">{{ subtask.Priority }}</td>
         <td class="px-6 py-4">{{ subtask.StartDate }}</td>
         <td class="px-6 py-4">{{ subtask.EndDate }}</td>
-        <td class="px-6 py-4">{{ subtask.CreatedBy.split('@')[0].lower() }}</td>
+        <td class="px-6 py-4">{{ subtask_created_by_user.Name }}</td>
         <td class="px-6 py-4">{{ subtask.CreationDate.date() }}</td>
         <td class="px-6 py-4">{{ subtask.Status }}</td>
         {% if user.User_Role not in ['Member'] %}
         <td class="px-6 py-4">
           <form action="{{ url_for('delete_subtask', subtask_id=subtask.id) }}" method="POST"
             onsubmit="return confirm('Are you sure you want to delete this subtask?');">
-            <button type="submit" class="btn btn-danger btn-sm bg-red-500" {% if subtask.CreatedBy.split('@')[0].lower()
-              !=user.Email.split('@')[0].lower() and user.User_Role not in ['Admin'] %} disabled{% endif
+            <button type="submit" class="btn btn-danger btn-sm bg-red-500" {% if subtask.CreatedBy
+              !=user.id and user.User_Role not in ['Admin'] %} disabled{% endif
               %}>Delete</button>
           </form>
         </td>

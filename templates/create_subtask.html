@@ -27,11 +27,8 @@ Create Sub-Task
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
           required>
           <option value="">-- Select --</option>
-          {% for member in Members %}
-          <option value="{{ member.Email }}">{{ member.Email.split('@')[0].lower() }}</option>
-          {% endfor %}
-          {% for team_lead in Team_Lead %}
-          <option value="{{ team_lead.Email }}">{{ team_lead.Email.split('@')[0].lower() }}</option>
+          {% for all_user in all_users %}
+          <option value="{{ all_user.id }}">{{ all_user.Name }}</option>
           {% endfor %}
         </select>
       </div>

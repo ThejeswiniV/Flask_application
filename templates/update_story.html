@@ -27,14 +27,6 @@ Update Story - {{ story.StoryName }}
       required>{{ story.StoryDescription }}</textarea>
   </div>
 
-  <div class="mb-3">
-    <label for="CreatedBy" class="block mb-2 text-sm font-medium text-gray-900">Created By <span
-        class="text-red-600">*</span></label>
-    <input type="text" id="CreatedBy" name="CreatedBy"
-      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-      value="{{ story.CreatedBy }}" required disabled>
-  </div>
-
   <div class="flex items-center md:flex-row flex-col mb-3">
     <div class="w-full md:mb-0 mb-3">
       <label for="StartDate" class="block mb-2 text-sm font-medium text-gray-900">Start Date <span

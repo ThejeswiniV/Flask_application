@@ -41,15 +41,15 @@ View Sub Task Status
             </tr>
           </thead>
           <tbody class="table_body">
-            {% for i_subtask in incomplete_subtasks %}
+            {% for i_subtask, i_subtask_assigned_to_user, i_subtask_created_by_user in incomplete_subtask_data_with_users %}
             <tr class="border-b">
               <th scope="row" class="px-6 py-4">{{ i_subtask.id }}</th>
               <td class="px-6 py-4">{{ i_subtask.SubtaskName }}</td>
               <!-- <td class="px-6 py-4">{{ i_subtask.SubtaskDescription }}</td> -->
-              <td class="px-6 py-4">{{ i_subtask.AssignedTo }}</td>
+              <td class="px-6 py-4">{{ i_subtask_assigned_to_user.Name }}</td>
               <td class="px-6 py-4">{{ i_subtask.StartDate }}</td>
               <td class="px-6 py-4">{{ i_subtask.EndDate }}</td>
-              <td class="px-6 py-4">{{ i_subtask.CreatedBy.split('@')[0].lower() }}</td>
+              <td class="px-6 py-4">{{ i_subtask_created_by_user.Name }}</td>
               <td class="px-6 py-4">{{ i_subtask.CreationDate.date() }}</td>
               <td class="px-6 py-4">{{ i_subtask.Status }}</td>
             </tr>
@@ -79,15 +79,15 @@ View Sub Task Status
             </tr>
           </thead>
           <tbody class="table_body">
-            {%for p_subtask in in_progress_subtasks %}
+            {%for p_subtask, p_subtask_assigned_to_user, p_subtask_created_by_user in in_progress_subtask_data_with_users %}
             <tr class="border-b">
               <th scope="row" class="px-6 py-4">{{ p_subtask.id }}</th>
               <td class="px-6 py-4">{{ p_subtask.SubtaskName }}</td>
               <!-- <td class="px-6 py-4">{{ p_subtask.SubtaskDescription }}</td> -->
-              <td class="px-6 py-4">{{ p_subtask.AssignedTo }}</td>
+              <td class="px-6 py-4">{{p_subtask_assigned_to_user.Name }}</td>
               <td class="px-6 py-4">{{ p_subtask.StartDate }}</td>
               <td class="px-6 py-4">{{ p_subtask.EndDate }}</td>
-              <td class="px-6 py-4">{{ p_subtask.CreatedBy.split('@')[0].lower() }}</td>
+              <td class="px-6 py-4">{{ p_subtask_created_by_user.Name  }}</td>
               <td class="px-6 py-4">{{ p_subtask.CreationDate.date() }}</td>
               <td class="px-6 py-4">{{ p_subtask.Status }}</td>
             </tr>
@@ -117,16 +117,16 @@ View Sub Task Status
             </tr>
           </thead>
           <tbody class="table_body">
-            {%for c_subtask in completed_subtasks %}
+            {%for c_subtask, c_subtask_assigned_to_user, c_subtask_created_by_user in completed_subtask_data_with_users %}
     
             <tr class=" border-b">
               <th scope="row" class="px-6 py-4">{{ c_subtask.id }}</th>
               <td class="px-6 py-4">{{ c_subtask.SubtaskName }}</td>
               <!-- <td class="px-6 py-4">{{ c_subtask.SubtaskDescription }}</td> -->
-              <td class="px-6 py-4">{{ c_subtask.AssignedTo }}</td>
+              <td class="px-6 py-4">{{ c_subtask_assigned_to_user.Name}}</td>
               <td class="px-6 py-4">{{ c_subtask.StartDate }}</td>
               <td class="px-6 py-4">{{ c_subtask.EndDate }}</td>
-              <td class="px-6 py-4">{{ c_subtask.CreatedBy.split('@')[0].lower() }}</td>
+              <td class="px-6 py-4">{{ c_subtask_created_by_user.Name }}</td>
               <td class="px-6 py-4">{{ c_subtask.CreationDate.date() }}</td>
               <td class="px-6 py-4">{{ c_subtask.Status }}</td>
             </tr>

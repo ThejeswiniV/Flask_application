@@ -33,7 +33,7 @@ Update Subtask - {{ subtask.SubtaskName }}
           class="text-red-600">*</span></label>
       <input type="text" id="CreatedBy" name="CreatedBy"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-        value="{{ subtask.CreatedBy.split('@')[0].lower() }}" required disabled>
+        value="{{ created_by_user.Name }}" required disabled>
     </div>
     <div class="md:mx-3"></div>
     <div class="w-full md:mb-0 mb-3">
@@ -43,9 +43,9 @@ Update Subtask - {{ subtask.SubtaskName }}
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
         required>
         <option value="">-- Select --</option>
-        {% for member in Members %}
-        <option value="{{ member.Email }}" {% if subtask.AssignedTo==member.Email or (not subtask.AssignedTo and
-          loop.first) %}selected{% endif %}>{{ member.Email }}</option>
+        {% for all_user in all_users %}
+        <option value="{{ all_user.id }}" {% if subtask.AssignedTo==all_user.id or (not subtask.AssignedTo and
+          loop.first) %}selected{% endif %}>{{ all_user.Name }}</option>
         {% endfor %}
       </select>
     </div>

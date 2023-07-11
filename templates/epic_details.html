@@ -95,7 +95,7 @@
           epic.CreationDate.date() }}</span></h5>
     </div>
     <div class="bg-white text-black p-3  mb-1 shadow-sm rounded">
-      <h5 class="font-bold  text-[#264653]">Created By : <span class="font-normal text-black">{{ epic.CreatedBy
+      <h5 class="font-bold  text-[#264653]">Created By : <span class="font-normal text-black">{{ created_by_user.Name
           }}</span></h5>
     </div>
   </div>
@@ -137,7 +137,7 @@
       </tr>
     </thead>
     <tbody class="table_body">
-      {% for story in stories %}
+      {% for story,story_created_by_user in story_data_with_users %}
       <tr class="border-b">
         <th scope="row" class="px-6 py-4">{{ story.id }}</th>
         <td class="px-6 py-4">
@@ -146,7 +146,7 @@
           </a>
         </td>
         <td class="px-6 py-4">{{ story.StoryDescription | truncate(50, True, '...') }}</td>
-        <td class="px-6 py-4">{{ story.CreatedBy.split('@')[0].lower() }}</td>
+        <td class="px-6 py-4">{{ story_created_by_user.Name }}</td>
         <td class="px-6 py-4">{{ story.StartDate }}</td>
         <td class="px-6 py-4">{{ story.EndDate }}</td>
         <td class="px-6 py-4">{{ story.CreationDate.date() }}</td>

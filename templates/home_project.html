@@ -90,12 +90,11 @@ Projects Home
             <td class="px-6 py-4"><a href="{{ url_for('project_details', project_id=project.id) }}"
                 class="text-blue-500 uppercase font-medium">{{ project.ProjectName }}</a></td>
             <td class="px-6 py-4">{{ project.ProjectOwner }}</td>
-            <td class="px-6 py-4">{{ project.ProjectManager.split('@')[0].lower() }}</td>
-            <td class="px-6 py-4">{{ project.CreatedBy.split('@')[0].lower() }}</td>
-            <td class="px-6 py-4">
-              {% set members = project.Members.split(',') %}
-              {% for member in members %}
-              {{ member.split('@')[0] }}{% if not loop.last %}, {% endif %}
+            <td class="px-6 py-4">{{ project_managers[project.id] }}</td>
+            <td class="px-6 py-4">{{ created_by_users[project.id] }}</td>
+            <td class="px-6 py-4"> 
+              {% for users in project.users %}
+              {{ users.Name }}{% if not loop.last %},{% endif %}
               {% endfor %}
             </td>
             <td class="px-6 py-4">{{ project.StartDate }}</td>
@@ -103,7 +102,7 @@ Projects Home
             <td class="px-6 py-4">{{ project.CreationDate.date() }}</td>
             {% if user.User_Role == 'Admin' %}
             <td class="px-6 py-4">
-              <form action="{{ url_for('delete_project', project_id=project.id) }}" method="POST">
+              <form action="{{ url_for('delete_project', project_id=project.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this Project?');">
                 <button type="submit" class="text-red-500">Delete</button>
               </form>
             </td>
